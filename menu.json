@@ -2,7 +2,18 @@
   "videos": {
     "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM"
   },
-  "items": [],
+  "items": [
+    {
+      "id": "row-1794462275393",
+      "category": "staff",
+      "name": "社員の一日",
+      "description": "一日の流れを密着",
+      "duration": "2〜3分",
+      "video": "https://www.youtube.com/watch?v=vQmKygPI9WM",
+      "interview": "",
+      "workplace": ""
+    }
+  ],
   "order": {
     "representative": [
       "代表者メッセージ",
@@ -14,7 +25,8 @@
       "社員が答える100の質問",
       "代表×社員 対談",
       "社員×社員 対談",
-      "座談会（3〜4名）"
+      "座談会（3〜4名）",
+      "row-1794462275393"
     ],
     "company": [
       "会社紹介",
