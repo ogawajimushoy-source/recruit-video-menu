@@ -16,7 +16,6 @@
       --green: #1b4a3a;
       --line: #ddd7cc;
       --card: #fffcf8;
-      --pill: #e5efe8;
     }
     * { box-sizing: border-box; }
     body {
@@ -26,33 +25,70 @@
       font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
       line-height: 1.7;
     }
-    main { width: min(760px, 100%); margin: 0 auto; padding: 48px 20px 80px; }
-    h1 {
-      margin: 12px 0 0;
-      font-family: "Shippori Mincho", "Yu Mincho", serif;
-      font-size: 36px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+    .bar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 16px;
+      padding: 12px 22px;
+      background: var(--green);
+      color: #f7f4ee;
     }
-    h2 {
-      margin: 36px 0 8px;
-      font-family: "Shippori Mincho", "Yu Mincho", serif;
-      font-size: 26px;
-      font-weight: 600;
+    .bar p { margin: 0; font-size: 14px; letter-spacing: 0.04em; }
+    .bar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .bar a { color: #f7f4ee; font-size: 14px; }
+    .bar button, .token-panel button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
     }
-    p { margin: 8px 0 0; }
-    a { color: var(--green); }
-    .kicker { margin: 0; color: var(--green); font-size: 13px; letter-spacing: 0.12em; }
-    .lead { color: #3a3834; font-size: 15px; }
-    form, .panel {
-      margin-top: 16px;
-      padding: 20px;
+    .bar .quiet, .token-panel .quiet {
+      background: transparent;
+      color: inherit;
+      border: 1px solid rgba(247, 244, 238, 0.55);
+    }
+    .token-panel .quiet { color: var(--green); border-color: var(--green); }
+    .go {
+      border: 0;
+      background: #fffcf8;
+      color: var(--green);
+      font-weight: 700;
+    }
+    .bar-note {
+      flex-basis: 100%;
+      margin: 0;
+      color: #f3efe4;
+      font-size: 13px;
+    }
+    .bar-note:empty { display: none; }
+    .bar-note.error { color: #ffd2c8; }
+    .hint {
+      width: min(920px, 100%);
+      margin: 0 auto;
+      padding: 16px 28px 0;
+      color: #3a3834;
+      font-size: 14px;
+    }
+    .hint p { margin: 0; }
+    .hint nav { display: flex; gap: 16px; margin-top: 6px; }
+    .hint a { color: var(--green); font-weight: 500; }
+    .token-panel {
+      width: min(920px, calc(100% - 44px));
+      margin: 12px auto 0;
+      padding: 16px 18px 18px;
       background: var(--card);
       border: 1px solid #ebe4d8;
       border-radius: 8px;
     }
-    label { display: block; margin: 14px 0 0; font-size: 14px; font-weight: 500; }
-    input, select {
+    .token-panel p { margin: 0; color: var(--muted); font-size: 13px; }
+    .token-panel label { display: block; margin-top: 12px; font-size: 14px; font-weight: 500; }
+    .token-panel input {
       width: 100%;
       margin-top: 6px;
       padding: 10px 12px;
@@ -63,262 +99,624 @@
       font: inherit;
       font-size: 16px;
     }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .checks { display: flex; gap: 16px; margin-top: 14px; font-size: 14px; }
-    .checks label { display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 400; }
-    .checks input { width: auto; margin: 0; }
-    button {
-      margin-top: 16px;
-      padding: 12px 18px;
+    #stage { min-height: 40vh; }
+    #stage .loading { width: min(920px, 100%); margin: 0 auto; padding: 28px; }
+  </style>
+  <style id="overrides">
+    body.editing .table-wrap { display: block; }
+    body.editing .cards { display: none; }
+    body.editing .menu-block { scroll-margin-top: 72px; }
+    body.editing .table-wrap table { min-width: 760px; }
+    body.editing #stage tbody th,
+    body.editing #stage tbody td { vertical-align: top; }
+    body.editing #stage th[scope="row"] { width: 46%; }
+    #stage .video-slot {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas: "label open" "input input";
+      align-items: center;
+      gap: 2px 10px;
+      margin-top: 8px;
+    }
+    #stage .video-label {
+      grid-area: label;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    #stage .video-slot input,
+    #stage .name-input,
+    #stage .desc-input,
+    #stage .duration-input,
+    #stage .price-input {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px dashed rgba(27, 74, 58, 0.45);
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      border-radius: 0;
+      padding: 2px 0;
+    }
+    #stage .video-slot input { grid-area: input; font-size: 14px; font-weight: 400; }
+    #stage .video-slot .sample { grid-area: open; margin-top: 0; white-space: nowrap; }
+    #stage .video-slot .sample[hidden] { display: none; }
+    #stage .name-input { display: block; font-size: 17px; font-weight: 700; }
+    #stage .desc-input { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; font-weight: 400; }
+    #stage .duration-input { font-size: 15px; }
+    #stage .price-input { font-size: 24px; font-weight: 700; text-align: right; }
+    #stage input:focus {
+      outline: none;
+      border-bottom-style: solid;
+      border-bottom-color: var(--green);
+    }
+    #stage input.bad { border-bottom-color: #8a3a2a; }
+    #stage input::placeholder { color: #b7b1a6; font-weight: 400; }
+    #stage .price-input::placeholder { font-size: 14px; }
+    #stage tr.draft { background: #f7fbf8; }
+    #stage .added-mark {
+      margin: 0 0 4px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+    #stage .row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 10px; }
+    #stage .text-btn, #stage .add-video, #stage .do-add {
+      font: inherit;
+      cursor: pointer;
+    }
+    #stage .text-btn {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--green);
+      font-size: 13px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    #stage .do-remove { color: var(--muted); }
+    #stage .do-add {
+      padding: 8px 14px;
       border: 0;
       border-radius: 6px;
       background: var(--green);
       color: #f7f4ee;
-      font: inherit;
-      font-size: 15px;
-      cursor: pointer;
+      font-size: 14px;
     }
-    button.quiet {
+    #stage .single-line { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+    #stage .single-line .price-input { width: 7em; flex: 0 0 auto; }
+    #stage .note-select {
+      width: auto;
+      padding: 4px 6px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    #stage .add-row td { border-bottom: 0; padding-top: 10px; }
+    #stage .add-video {
+      width: 100%;
+      padding: 12px;
+      border: 1px dashed var(--green);
+      border-radius: 8px;
       background: transparent;
       color: var(--green);
-      border: 1px solid var(--green);
+      font-size: 15px;
     }
-    button.linkish {
-      margin: 0;
-      padding: 0;
-      background: none;
-      color: var(--muted);
-      font-size: 13px;
-      text-decoration: underline;
-    }
-    .item { padding: 14px 0; border-bottom: 1px solid var(--line); }
-    .item:last-child { border-bottom: 0; }
-    .item h3 { margin: 0; font-size: 16px; }
-    .cat { color: var(--green); font-size: 12px; letter-spacing: 0.08em; }
-    .status { min-height: 1.5em; margin-top: 12px; font-size: 14px; }
-    .status.error { color: #8a3a2a; }
-    .help { color: var(--muted); font-size: 13px; }
-    #single-fields { display: none; }
-    @media (max-width: 640px) {
-      h1 { font-size: 30px; }
-      .row, .checks { grid-template-columns: 1fr; display: grid; }
+    #stage .add-video:hover, #stage .add-video:focus { background: #f7fbf8; }
+    @media (max-width: 700px) {
+      body.editing .table-wrap { overflow: visible; }
+      body.editing .table-wrap table,
+      body.editing #stage tbody,
+      body.editing #stage tbody tr,
+      body.editing #stage tbody th,
+      body.editing #stage tbody td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+      }
+      body.editing #stage thead { display: none; }
+      body.editing #stage tbody tr {
+        padding: 6px 0 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      body.editing #stage tr.add-row { border-bottom: 0; }
+      body.editing #stage tbody th,
+      body.editing #stage tbody td {
+        padding: 6px 0;
+        border-bottom: 0;
+        text-align: left;
+        white-space: normal;
+      }
+      body.editing #stage td.duration::before,
+      body.editing #stage td.price::before {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+      }
+      body.editing #stage td.duration::before { content: "尺の目安"; }
+      body.editing #stage td.price:nth-child(3)::before { content: "インタビューのみ"; }
+      body.editing #stage td.price:nth-child(4)::before { content: "仕事風景の撮影込み"; }
+      body.editing #stage td.price[colspan="2"]::before { content: "料金"; }
+      body.editing #stage .price-input { text-align: left; }
+      body.editing #stage .single-line { justify-content: flex-start; }
     }
   </style>
 </head>
-<body>
-  <main>
-    <p class="kicker">株式会社ファディー</p>
-    <h1>料金表を編集</h1>
-    <p class="lead">動画の種類と参考動画を追加できます。公開すると、料金表のURLに反映されます。反映まで1分ほどかかります。</p>
-    <p><a href="./">料金表を見る</a></p>
-
-    <h2>保存に使うトークン</h2>
-    <p class="help">このブラウザだけに残します。料金表のページには出ません。まだ無い場合は、<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHubでトークンを作成</a>してください。対象リポジトリは recruit-video-menu、権限は Contents の Read and write です。</p>
-    <form id="token-form">
-      <label>トークン
-        <input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
-      </label>
-      <button type="submit">このブラウザに保存</button>
-      <button id="forget" class="quiet" type="button">保存したトークンを消す</button>
-      <p id="token-state" class="help"></p>
-    </form>
-
-    <h2>動画の種類を追加</h2>
-    <form id="item-form">
-      <label>カテゴリー
-        <select id="category" required>
-          <option value="representative">代表</option>
-          <option value="staff">社員</option>
-          <option value="company">会社</option>
-        </select>
-      </label>
-      <label>動画の名前
-        <input id="name" required placeholder="例：社長インタビュー">
-      </label>
-      <label>説明
-        <input id="description" placeholder="例：求職者への直接の呼びかけ">
-      </label>
-      <label>尺の目安
-        <input id="duration" required placeholder="例：2〜3分">
-      </label>
-      <div class="checks">
-        <label><input type="radio" name="mode" value="split" checked>料金を2つ書く</label>
-        <label><input type="radio" name="mode" value="single">料金は1つ</label>
-      </div>
-      <div id="split-fields" class="row">
-        <label>インタビューのみ
-          <input id="interview" inputmode="numeric" placeholder="20万円。空欄は対象外">
-        </label>
-        <label>仕事風景の撮影込み
-          <input id="workplace" inputmode="numeric" placeholder="30万円。空欄は対象外">
-        </label>
-      </div>
-      <div id="single-fields">
-        <div class="row">
-          <label>料金
-            <input id="single" inputmode="numeric" placeholder="25万円">
-          </label>
-          <label>注記
-            <select id="note">
-              <option value="（一律）">一律</option>
-              <option value="（インサート込み）">インサート込み</option>
-            </select>
-          </label>
-        </div>
-      </div>
-      <label>参考動画のURL（あとからでも可）
-        <input id="item-video" type="url" placeholder="https://www.youtube.com/watch?v=...">
-      </label>
-      <button type="submit">追加する</button>
-    </form>
-
-    <h2>参考動画を追加</h2>
-    <p class="help">すでにある動画に、YouTubeのURLを貼ります。空欄にして公開すると、参考動画ボタンは出ません。</p>
-    <div id="video-list" class="panel"></div>
-
-    <button id="publish" type="button">公開する</button>
-    <p id="status" class="status"></p>
-  </main>
+<body class="editing">
+  <header class="bar">
+    <p>料金表を直接編集</p>
+    <div class="bar-actions">
+      <button id="token-toggle" class="quiet" type="button">保存の設定</button>
+      <a href="./" target="_blank" rel="noopener noreferrer">公開中の料金表</a>
+      <button id="editor-publish" class="go" type="button">公開する</button>
+    </div>
+    <p id="editor-status" class="bar-note" role="status"></p>
+    <p id="editor-dirty" class="bar-note"></p>
+  </header>
+  <div class="hint">
+    <p>お客さまに見せる料金表です。各行の「参考動画」にURLを貼れます。表の下の「＋ 動画を追加」で、新しい行を入れられます。</p>
+    <nav>
+      <a href="#representative">代表</a>
+      <a href="#staff">社員</a>
+      <a href="#company">会社</a>
+    </nav>
+  </div>
+  <form id="token-panel" class="token-panel" hidden>
+    <p>トークンはこのブラウザだけに残ります。料金表のページには出ません。まだ無い場合は、<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHubでトークンを作成</a>してください。対象リポジトリは recruit-video-menu、権限は Contents の Read and write です。</p>
+    <label>トークン
+      <input id="editor-token" type="password" autocomplete="off" placeholder="github_pat_...">
+    </label>
+    <button type="submit">このブラウザに保存</button>
+    <button id="forget" class="quiet" type="button">保存したトークンを消す</button>
+    <p id="token-state"></p>
+  </form>
+  <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
   <script src="menu.js"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var state = { videos: {}, items: [] };
+    var tracked = {};
+    var savedRaw = "";
+    var publishing = false;
 
-    function token() {
-      return document.getElementById("token").value.trim();
+    function el(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    function digits(value) {
+      return String(value || "").replace(/[０-９]/g, function (ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 65248);
+      }).trim();
+    }
+
+    function isPrice(value) {
+      return /^\d+(?:\.\d+)?万円$/.test(MenuKit.yen(digits(value)));
     }
 
     function setStatus(message, isError) {
-      var status = document.getElementById("status");
+      var status = document.getElementById("editor-status");
       status.textContent = message;
-      status.className = isError ? "status error" : "status";
+      status.className = isError ? "bar-note error" : "bar-note";
     }
 
-    function namesInUse() {
+    function token() {
+      return document.getElementById("editor-token").value.trim();
+    }
+
+    function rawSnapshot() {
+      return JSON.stringify({ videos: state.videos, items: state.items });
+    }
+
+    function markDirty() {
+      var dirty = rawSnapshot() !== savedRaw;
+      document.getElementById("editor-dirty").textContent = dirty
+        ? "まだ公開前です。公開すると、1分ほどで料金表のURLに反映されます。"
+        : "";
+    }
+
+    function findRow(name) {
+      var rows = document.querySelectorAll("#stage tbody tr");
+      var i;
+      for (i = 0; i < rows.length; i++) {
+        if (rows[i].dataset.extra === "1" || rows[i].classList.contains("draft") || rows[i].classList.contains("add-row")) continue;
+        var nameEl = rows[i].querySelector(".name");
+        if (nameEl && nameEl.textContent.trim() === name) return rows[i];
+      }
+      return null;
+    }
+
+    function namesInUse(skipIndex) {
       var names = MenuKit.base.map(function (item) { return item.name; });
-      state.items.forEach(function (item) { names.push(item.name); });
+      state.items.forEach(function (item, index) {
+        if (index === skipIndex) return;
+        if (item.name) names.push(item.name.trim());
+      });
       return names;
     }
 
-    function renderVideos() {
-      var list = document.getElementById("video-list");
-      list.replaceChildren();
-      var groups = [
-        { id: "representative", label: "代表", rows: MenuKit.base.filter(function (item) { return item.category === "representative"; }) },
-        { id: "staff", label: "社員", rows: MenuKit.base.filter(function (item) { return item.category === "staff"; }) },
-        { id: "company", label: "会社", rows: MenuKit.base.filter(function (item) { return item.category === "company"; }) }
-      ];
-      groups.forEach(function (group) {
-        group.rows.forEach(function (item) { addVideoRow(list, item.name, group.label, false); });
-      });
-      state.items.forEach(function (item, index) {
-        addVideoRow(list, item.name, MenuKit.categories[item.category] + "・追加", true, index);
-      });
-    }
-
-    function addVideoRow(list, name, label, extra, index) {
-      var row = document.createElement("div");
-      row.className = "item";
-      var cat = document.createElement("p");
-      cat.className = "cat";
-      cat.textContent = label;
-      var title = document.createElement("h3");
-      title.textContent = name;
-      var field = document.createElement("label");
-      field.textContent = "参考動画のURL";
-      var input = document.createElement("input");
-      input.type = "url";
-      input.placeholder = "https://www.youtube.com/watch?v=...";
-      input.value = extra ? (state.items[index].video || "") : (state.videos[name] || "");
-      input.addEventListener("input", function () {
-        if (extra) state.items[index].video = input.value.trim();
-        else state.videos[name] = input.value.trim();
-      });
-      field.append(input);
-      row.append(cat, title, field);
-      if (extra) {
-        var remove = document.createElement("button");
-        remove.className = "linkish";
-        remove.type = "button";
-        remove.textContent = "この追加を取り消す";
-        remove.addEventListener("click", function () {
-          state.items.splice(index, 1);
-          renderVideos();
-        });
-        row.append(remove);
+    function validateItem(item, skipIndex) {
+      if (!item.name) return "動画の名前を入力してください。";
+      if (namesInUse(skipIndex).indexOf(item.name.trim()) !== -1) return "同じ名前の動画がすでにあります。";
+      if (!item.duration) return "尺の目安を入力してください。";
+      if (item.video && !MenuKit.safeUrl(item.video)) return "参考動画は https で始まるURLにしてください。";
+      if (item.single) {
+        if (!isPrice(item.single)) return "料金を入力してください。";
+      } else if (!isPrice(item.interview) && !isPrice(item.workplace)) {
+        return "料金をどちらか入力してください。空欄は対象外になります。";
       }
-      list.append(row);
+      return "";
     }
 
-    function readMode() {
-      return document.querySelector("input[name=mode]:checked").value;
+    function copyItem(item) {
+      var copy = {
+        category: item.category,
+        name: item.name.trim(),
+        description: (item.description || "").trim(),
+        duration: (item.duration || "").trim(),
+        video: MenuKit.safeUrl(item.video)
+      };
+      if (item.single) {
+        copy.single = MenuKit.yen(digits(item.single));
+        copy.note = item.note || "（一律）";
+      } else {
+        copy.interview = MenuKit.yen(digits(item.interview));
+        copy.workplace = MenuKit.yen(digits(item.workplace));
+      }
+      return copy;
     }
 
-    document.querySelectorAll("input[name=mode]").forEach(function (input) {
-      input.addEventListener("change", function () {
-        var single = readMode() === "single";
-        document.getElementById("split-fields").style.display = single ? "none" : "grid";
-        document.getElementById("single-fields").style.display = single ? "block" : "none";
+    function buildPayload() {
+      var payload = { videos: {}, items: state.items.map(copyItem) };
+      Object.keys(state.videos).forEach(function (name) {
+        var url = MenuKit.safeUrl(state.videos[name]);
+        if (url || tracked[name]) payload.videos[name] = url;
       });
-    });
+      return payload;
+    }
 
-    document.getElementById("item-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      var name = document.getElementById("name").value.trim();
-      if (namesInUse().indexOf(name) !== -1) {
-        setStatus("同じ名前の動画がすでにあります。", true);
-        return;
+    function videoSlot(value, onInput) {
+      var wrap = el("div", "video-slot");
+      var label = el("span", "video-label", "参考動画");
+      var input = el("input", "video-input");
+      input.type = "url";
+      input.placeholder = "URLを貼る";
+      input.spellcheck = false;
+      input.autocomplete = "off";
+      input.setAttribute("aria-label", "参考動画のURL");
+      input.value = value || "";
+      var open = el("a", "sample", "開く");
+      open.target = "_blank";
+      open.rel = "noopener noreferrer";
+      function syncLink() {
+        var url = MenuKit.safeUrl(input.value);
+        open.hidden = !url;
+        if (url) open.href = url;
+      }
+      input.addEventListener("input", function () {
+        input.classList.remove("bad");
+        syncLink();
+        if (onInput) onInput(input.value.trim());
+      });
+      input.addEventListener("blur", function () {
+        input.classList.toggle("bad", !!(input.value.trim() && !MenuKit.safeUrl(input.value)));
+      });
+      syncLink();
+      wrap.append(label, input, open);
+      return wrap;
+    }
+
+    function textInput(className, value, placeholder, label) {
+      var input = el("input", className);
+      input.value = value || "";
+      input.placeholder = placeholder;
+      input.autocomplete = "off";
+      input.setAttribute("aria-label", label);
+      return input;
+    }
+
+    function readFields(tr) {
+      function val(selector) {
+        var node = tr.querySelector(selector);
+        return node ? node.value.trim() : "";
       }
       var item = {
-        category: document.getElementById("category").value,
-        name: name,
-        description: document.getElementById("description").value.trim(),
-        duration: document.getElementById("duration").value.trim(),
-        video: document.getElementById("item-video").value.trim()
+        category: tr.dataset.category,
+        name: val(".name-input"),
+        description: val(".desc-input"),
+        duration: val(".duration-input"),
+        video: val(".video-input")
       };
-      if (item.video && !MenuKit.safeUrl(item.video)) {
-        setStatus("参考動画は https で始まるURLにしてください。", true);
-        return;
-      }
-      if (readMode() === "single") {
-        item.single = document.getElementById("single").value.trim();
-        item.note = document.getElementById("note").value;
-        if (!MenuKit.yen(item.single)) {
-          setStatus("料金を入力してください。", true);
-          return;
-        }
+      if (tr.dataset.mode === "single") {
+        item.single = val(".price-input");
+        item.note = val(".note-select") || "（一律）";
       } else {
-        item.interview = document.getElementById("interview").value.trim();
-        item.workplace = document.getElementById("workplace").value.trim();
-        if (!MenuKit.yen(item.interview) && !MenuKit.yen(item.workplace)) {
-          setStatus("料金をどちらか入力してください。空欄は対象外になります。", true);
-          return;
-        }
+        var prices = tr.querySelectorAll(".price-input");
+        item.interview = prices[0] ? prices[0].value.trim() : "";
+        item.workplace = prices[1] ? prices[1].value.trim() : "";
       }
-      state.items.push(item);
-      event.target.reset();
-      document.querySelector("input[name=mode][value=split]").checked = true;
-      document.getElementById("split-fields").style.display = "grid";
-      document.getElementById("single-fields").style.display = "none";
-      renderVideos();
-      setStatus("追加しました。まだ公開前です。下の「公開する」を押すと料金表に出ます。", false);
-    });
+      return item;
+    }
 
-    document.getElementById("token-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      if (!token()) {
-        setStatus("トークンを入力してください。", true);
+    function setSplit(item) {
+      item.interview = item.single || item.interview || "";
+      item.workplace = "";
+      delete item.single;
+      delete item.note;
+      return item;
+    }
+
+    function setSingle(item) {
+      var note = item.note || "（一律）";
+      item.single = item.single || item.interview || item.workplace || "";
+      item.note = note;
+      delete item.interview;
+      delete item.workplace;
+      return item;
+    }
+
+    function appendPrices(tr, item) {
+      if (item.single != null && tr.dataset.mode === "single") {
+        var singleCell = el("td", "price");
+        singleCell.colSpan = 2;
+        var line = el("div", "single-line");
+        var price = textInput("price-input", item.single, "25万円", "料金");
+        price.inputMode = "numeric";
+        var select = document.createElement("select");
+        select.className = "note-select";
+        select.setAttribute("aria-label", "料金の注記");
+        ["（一律）", "（インサート込み）"].forEach(function (note) {
+          var option = document.createElement("option");
+          option.value = note;
+          option.textContent = note;
+          if ((item.note || "（一律）") === note) option.selected = true;
+          select.append(option);
+        });
+        line.append(price, select);
+        singleCell.append(line);
+        tr.append(singleCell);
         return;
       }
-      localStorage.setItem(TOKEN_KEY, token());
-      document.getElementById("token-state").textContent = "このブラウザに保存しました。";
-    });
+      [
+        [item.interview || "", "インタビューのみ"],
+        [item.workplace || "", "仕事風景の撮影込み"]
+      ].forEach(function (pair) {
+        var cell = el("td", "price");
+        var price = textInput("price-input", pair[0], "対象外", pair[1]);
+        price.inputMode = "numeric";
+        cell.append(price);
+        tr.append(cell);
+      });
+    }
 
-    document.getElementById("forget").addEventListener("click", function () {
-      localStorage.removeItem(TOKEN_KEY);
-      document.getElementById("token").value = "";
-      document.getElementById("token-state").textContent = "トークンを消しました。";
-    });
+    function bindPrices(tr, sync) {
+      tr.querySelectorAll(".price-input").forEach(function (input) {
+        input.addEventListener("blur", function () {
+          var formatted = MenuKit.yen(digits(input.value));
+          if (input.value.trim()) input.value = formatted;
+          if (sync) sync();
+        });
+      });
+    }
+
+    function rowShell(item, mode) {
+      var tr = document.createElement("tr");
+      tr.dataset.category = item.category;
+      tr.dataset.mode = mode;
+      var th = document.createElement("th");
+      th.scope = "row";
+      th.append(
+        textInput("name-input", item.name, "動画の名前", "動画の名前"),
+        textInput("desc-input", item.description || "", "説明", "説明"),
+        videoSlot(item.video || "", null)
+      );
+      var duration = el("td", "duration");
+      duration.append(textInput("duration-input", item.duration || "", "2〜3分", "尺の目安"));
+      tr.append(th, duration);
+      appendPrices(tr, item);
+      return tr;
+    }
+
+    function placeActions(tr, actions) {
+      var box = el("div", "row-actions");
+      actions.forEach(function (action) { box.append(action); });
+      tr.querySelector("th").append(box);
+    }
+
+    function button(className, text, onClick) {
+      var node = el("button", className, text);
+      node.type = "button";
+      node.addEventListener("click", onClick);
+      return node;
+    }
+
+    function appendExtra(item, index) {
+      var tbody = document.querySelector("#" + item.category + " tbody");
+      if (!tbody) return;
+      var tr = rowShell(item, item.single != null ? "single" : "split");
+      tr.dataset.extra = "1";
+      tr.dataset.index = String(index);
+      tr.querySelector("th").insertBefore(el("p", "added-mark", "追加した行"), tr.querySelector("th").firstChild);
+      function sync() {
+        state.items[Number(tr.dataset.index)] = readFields(tr);
+        markDirty();
+      }
+      tr.querySelectorAll("input, select").forEach(function (node) {
+        node.addEventListener("input", sync);
+        node.addEventListener("change", sync);
+      });
+      bindPrices(tr, sync);
+      placeActions(tr, [
+        button("text-btn do-mode", tr.dataset.mode === "single" ? "2つの料金に戻す" : "料金を1つにする", function () {
+          var current = readFields(tr);
+          state.items[Number(tr.dataset.index)] = tr.dataset.mode === "single" ? setSplit(current) : setSingle(current);
+          paint();
+          markDirty();
+        }),
+        button("text-btn do-remove", "この行を消す", function () {
+          state.items.splice(Number(tr.dataset.index), 1);
+          paint();
+          markDirty();
+        })
+      ]);
+      tbody.append(tr);
+    }
+
+    function draftHasText(tr) {
+      return Array.prototype.some.call(tr.querySelectorAll("input"), function (input) {
+        return input.value.trim() !== "";
+      });
+    }
+
+    function normalizeItem(item) {
+      var copy = {
+        category: item.category,
+        name: item.name.trim(),
+        description: (item.description || "").trim(),
+        duration: (item.duration || "").trim(),
+        video: (item.video || "").trim()
+      };
+      if (item.single != null) {
+        copy.single = MenuKit.yen(digits(item.single));
+        copy.note = item.note || "（一律）";
+      } else {
+        copy.interview = MenuKit.yen(digits(item.interview));
+        copy.workplace = MenuKit.yen(digits(item.workplace));
+      }
+      return copy;
+    }
+
+    function openDraft(category) {
+      var existing = document.querySelector("#stage tr.draft");
+      if (existing) {
+        if (existing.dataset.category === category) {
+          existing.querySelector(".name-input").focus();
+          return;
+        }
+        if (draftHasText(existing) && !window.confirm("入力中の行をやめますか？")) return;
+        existing.remove();
+      }
+      var tr = rowShell({
+        category: category,
+        name: "",
+        description: "",
+        duration: "",
+        interview: "",
+        workplace: "",
+        video: ""
+      }, "split");
+      tr.className = "draft";
+      bindPrices(tr, null);
+      placeDraftActions(tr);
+      document.querySelector("#" + category + " tr.add-row").before(tr);
+      tr.scrollIntoView({ block: "center" });
+      tr.querySelector(".name-input").focus();
+    }
+
+    function placeDraftActions(tr) {
+      placeActions(tr, [
+        button("text-btn do-mode", tr.dataset.mode === "single" ? "2つの料金に戻す" : "料金を1つにする", function () {
+          var current = readFields(tr);
+          var next = tr.dataset.mode === "single" ? setSplit(current) : setSingle(current);
+          var rebuilt = rowShell(next, next.single != null ? "single" : "split");
+          rebuilt.className = "draft";
+          bindPrices(rebuilt, null);
+          placeDraftActions(rebuilt);
+          tr.replaceWith(rebuilt);
+          rebuilt.querySelector(".name-input").focus();
+        }),
+        button("do-add", "この行を入れる", function () {
+          var item = normalizeItem(readFields(tr));
+          var message = validateItem(item, -1);
+          if (message) {
+            setStatus(message, true);
+            return;
+          }
+          state.items.push(item);
+          paint();
+          markDirty();
+          setStatus("行を追加しました。公開すると料金表に出ます。", false);
+        }),
+        button("text-btn do-cancel", "やめる", function () {
+          tr.remove();
+          setStatus("", false);
+        })
+      ]);
+    }
+
+    function paint() {
+      document.querySelectorAll("#stage tr[data-extra], #stage tr.draft, #stage tr.add-row").forEach(function (node) {
+        node.remove();
+      });
+      state.items.forEach(appendExtra);
+      ["representative", "staff", "company"].forEach(function (id) {
+        var tbody = document.querySelector("#" + id + " tbody");
+        if (!tbody) return;
+        var tr = document.createElement("tr");
+        tr.className = "add-row";
+        var td = document.createElement("td");
+        td.colSpan = 4;
+        td.append(button("add-video", "＋ 動画を追加", function () { openDraft(id); }));
+        tr.append(td);
+        tbody.append(tr);
+      });
+    }
+
+    function mountBase() {
+      MenuKit.base.forEach(function (item) {
+        var row = findRow(item.name);
+        if (!row) return;
+        var link = row.querySelector("a.sample");
+        var initial = "";
+        if (Object.prototype.hasOwnProperty.call(state.videos, item.name)) initial = state.videos[item.name];
+        else if (link) {
+          initial = link.href;
+          state.videos[item.name] = link.href;
+          tracked[item.name] = true;
+        }
+        if (link) link.remove();
+        row.querySelector("th").append(videoSlot(initial, function (value) {
+          state.videos[item.name] = value;
+          if (value) tracked[item.name] = true;
+          markDirty();
+        }));
+      });
+    }
+
+    function refreshBaseLinks() {
+      MenuKit.base.forEach(function (item) {
+        var row = findRow(item.name);
+        if (!row) return;
+        var input = row.querySelector(".video-input");
+        var open = row.querySelector("a.sample");
+        if (!input) return;
+        input.value = state.videos[item.name] || "";
+        var url = MenuKit.safeUrl(input.value);
+        if (open) {
+          open.hidden = !url;
+          if (url) open.href = url;
+        }
+      });
+    }
+
+    function normalizeState() {
+      state.items = state.items.map(copyItem);
+      Object.keys(state.videos).forEach(function (name) {
+        state.videos[name] = MenuKit.safeUrl(state.videos[name]);
+      });
+    }
 
     function toBase64(text) {
       var bytes = new TextEncoder().encode(text);
@@ -327,36 +725,61 @@
       return btoa(bin);
     }
 
-    document.getElementById("publish").addEventListener("click", function () {
-      var savedToken = localStorage.getItem(TOKEN_KEY) || token();
-      if (!savedToken) {
-        setStatus("先にトークンを保存してください。", true);
-        document.getElementById("token").focus();
+    function validateAll() {
+      var draft = document.querySelector("#stage tr.draft");
+      if (draft && draftHasText(draft)) return "追加中の行があります。「この行を入れる」を押してから公開してください。";
+      var i;
+      for (i = 0; i < MenuKit.base.length; i++) {
+        var name = MenuKit.base[i].name;
+        if (state.videos[name] && !MenuKit.safeUrl(state.videos[name])) {
+          return name + "の参考動画は https で始まるURLにしてください。";
+        }
+      }
+      for (i = 0; i < state.items.length; i++) {
+        var message = validateItem(state.items[i], i);
+        if (message) return message;
+      }
+      return "";
+    }
+
+    document.getElementById("token-toggle").addEventListener("click", function () {
+      var panel = document.getElementById("token-panel");
+      panel.hidden = !panel.hidden;
+      if (!panel.hidden) document.getElementById("editor-token").focus();
+    });
+
+    document.getElementById("token-panel").addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!token()) {
+        setStatus("トークンを入力してください。", true);
         return;
       }
-      var payload = {
-        videos: {},
-        items: state.items.map(function (item) {
-          var copy = {
-            category: item.category,
-            name: item.name,
-            description: item.description,
-            duration: item.duration,
-            video: MenuKit.safeUrl(item.video)
-          };
-          if (item.single) {
-            copy.single = MenuKit.yen(item.single);
-            copy.note = item.note;
-          } else {
-            copy.interview = MenuKit.yen(item.interview);
-            copy.workplace = MenuKit.yen(item.workplace);
-          }
-          return copy;
-        })
-      };
-      Object.keys(state.videos).forEach(function (name) {
-        payload.videos[name] = MenuKit.safeUrl(state.videos[name]);
-      });
+      localStorage.setItem(TOKEN_KEY, token());
+      document.getElementById("token-state").textContent = "このブラウザに保存しました。";
+      setStatus("", false);
+    });
+
+    document.getElementById("forget").addEventListener("click", function () {
+      localStorage.removeItem(TOKEN_KEY);
+      document.getElementById("editor-token").value = "";
+      document.getElementById("token-state").textContent = "トークンを消しました。";
+    });
+
+    document.getElementById("editor-publish").addEventListener("click", function () {
+      if (publishing) return;
+      var message = validateAll();
+      if (message) {
+        setStatus(message, true);
+        return;
+      }
+      var savedToken = localStorage.getItem(TOKEN_KEY) || token();
+      if (!savedToken) {
+        document.getElementById("token-panel").hidden = false;
+        setStatus("先にトークンを保存してください。", true);
+        document.getElementById("editor-token").focus();
+        return;
+      }
+      publishing = true;
       setStatus("公開しています…", false);
       var api = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
       var headers = {
@@ -364,7 +787,7 @@
         Authorization: "Bearer " + savedToken,
         "X-GitHub-Api-Version": "2022-11-28"
       };
-      fetch(api, { headers: headers })
+      fetch(api, { headers: headers, cache: "no-store" })
         .then(function (response) {
           if (response.status === 404) return "";
           if (!response.ok) throw new Error(String(response.status));
@@ -373,7 +796,7 @@
         .then(function (sha) {
           var body = {
             message: "Update the price list from the browser editor.",
-            content: toBase64(JSON.stringify(payload, null, 2) + "\n")
+            content: toBase64(JSON.stringify(buildPayload(), null, 2) + "\n")
           };
           if (sha) body.sha = sha;
           return fetch(api, {
@@ -386,29 +809,69 @@
           if (response.status === 401) throw new Error("トークンが違います。");
           if (response.status === 403) throw new Error("このトークンでは保存できません。Contents の書き込み権限を確認してください。");
           if (!response.ok) throw new Error("保存に失敗しました。");
+          normalizeState();
+          paint();
+          refreshBaseLinks();
+          savedRaw = rawSnapshot();
+          markDirty();
           setStatus("公開しました。1分ほどで料金表に反映されます。", false);
         })
         .catch(function (error) {
           setStatus(error.message || "保存に失敗しました。", true);
-        });
+        })
+        .then(function () { publishing = false; });
+    });
+
+    window.addEventListener("beforeunload", function (event) {
+      if (rawSnapshot() !== savedRaw) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
     });
 
     var stored = localStorage.getItem(TOKEN_KEY) || "";
     if (stored) {
-      document.getElementById("token").value = stored;
+      document.getElementById("editor-token").value = stored;
       document.getElementById("token-state").textContent = "保存済みのトークンを使います。";
+    } else {
+      document.getElementById("token-panel").hidden = false;
     }
 
-    fetch("menu.json?t=" + Date.now(), { cache: "no-store" })
-      .then(function (response) { return response.ok ? response.json() : { videos: {}, items: [] }; })
-      .then(function (data) {
-        state.videos = Object.assign({
-          "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM"
-        }, data.videos || {});
-        state.items = data.items || [];
-        renderVideos();
+    function start(html, data) {
+      var style = (html.match(/<style>([\s\S]*?)<\/style>/) || [])[1] || "";
+      var main = (html.match(/<main class="sheet">[\s\S]*?<\/main>/) || [])[0] || "";
+      var stage = document.getElementById("stage");
+      if (!style || !main) {
+        stage.textContent = "料金表の読み込みに失敗しました。";
+        return;
+      }
+      var previewStyle = document.createElement("style");
+      previewStyle.textContent = style;
+      document.head.append(previewStyle, document.getElementById("overrides"));
+      stage.innerHTML = main;
+      Object.keys(data.videos || {}).forEach(function (name) {
+        tracked[name] = true;
+        state.videos[name] = data.videos[name] || "";
+      });
+      state.items = (data.items || []).map(function (item) {
+        return Object.assign({}, item);
+      });
+      mountBase();
+      paint();
+      savedRaw = rawSnapshot();
+      markDirty();
+    }
+
+    Promise.all([
+      fetch("index.html?t=" + Date.now(), { cache: "no-store" }).then(function (response) { return response.text(); }),
+      fetch("menu.json?t=" + Date.now(), { cache: "no-store" }).then(function (response) {
+        return response.ok ? response.json() : { videos: {}, items: [] };
       })
-      .catch(function () { renderVideos(); });
+    ]).then(function (pair) {
+      start(pair[0], pair[1]);
+    }).catch(function () {
+      document.getElementById("stage").textContent = "料金表の読み込みに失敗しました。";
+    });
   </script>
 </body>
 </html>
