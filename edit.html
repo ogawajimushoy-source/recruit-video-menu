@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>料金表の編集 | 株式会社ファディー</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4f1ea;
+      --ink: #1c1c1c;
+      --muted: #6f6b64;
+      --green: #1b4a3a;
+      --line: #ddd7cc;
+      --card: #fffcf8;
+      --pill: #e5efe8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
+      line-height: 1.7;
+    }
+    main { width: min(760px, 100%); margin: 0 auto; padding: 48px 20px 80px; }
+    h1 {
+      margin: 12px 0 0;
+      font-family: "Shippori Mincho", "Yu Mincho", serif;
+      font-size: 36px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    h2 {
+      margin: 36px 0 8px;
+      font-family: "Shippori Mincho", "Yu Mincho", serif;
+      font-size: 26px;
+      font-weight: 600;
+    }
+    p { margin: 8px 0 0; }
+    a { color: var(--green); }
+    .kicker { margin: 0; color: var(--green); font-size: 13px; letter-spacing: 0.12em; }
+    .lead { color: #3a3834; font-size: 15px; }
+    form, .panel {
+      margin-top: 16px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid #ebe4d8;
+      border-radius: 8px;
+    }
+    label { display: block; margin: 14px 0 0; font-size: 14px; font-weight: 500; }
+    input, select {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .checks { display: flex; gap: 16px; margin-top: 14px; font-size: 14px; }
+    .checks label { display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 400; }
+    .checks input { width: auto; margin: 0; }
+    button {
+      margin-top: 16px;
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--green);
+      color: #f7f4ee;
+      font: inherit;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button.quiet {
+      background: transparent;
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+    button.linkish {
+      margin: 0;
+      padding: 0;
+      background: none;
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: underline;
+    }
+    .item { padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .item:last-child { border-bottom: 0; }
+    .item h3 { margin: 0; font-size: 16px; }
+    .cat { color: var(--green); font-size: 12px; letter-spacing: 0.08em; }
+    .status { min-height: 1.5em; margin-top: 12px; font-size: 14px; }
+    .status.error { color: #8a3a2a; }
+    .help { color: var(--muted); font-size: 13px; }
+    #single-fields { display: none; }
+    @media (max-width: 640px) {
+      h1 { font-size: 30px; }
+      .row, .checks { grid-template-columns: 1fr; display: grid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">株式会社ファディー</p>
+    <h1>料金表を編集</h1>
+    <p class="lead">動画の種類と参考動画を追加できます。公開すると、料金表のURLに反映されます。反映まで1分ほどかかります。</p>
+    <p><a href="./">料金表を見る</a></p>
+
+    <h2>保存に使うトークン</h2>
+    <p class="help">このブラウザだけに残します。料金表のページには出ません。まだ無い場合は、<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHubでトークンを作成</a>してください。対象リポジトリは recruit-video-menu、権限は Contents の Read and write です。</p>
+    <form id="token-form">
+      <label>トークン
+        <input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
+      </label>
+      <button type="submit">このブラウザに保存</button>
+      <button id="forget" class="quiet" type="button">保存したトークンを消す</button>
+      <p id="token-state" class="help"></p>
+    </form>
+
+    <h2>動画の種類を追加</h2>
+    <form id="item-form">
+      <label>カテゴリー
+        <select id="category" required>
+          <option value="representative">代表</option>
+          <option value="staff">社員</option>
+          <option value="company">会社</option>
+        </select>
+      </label>
+      <label>動画の名前
+        <input id="name" required placeholder="例：社長インタビュー">
+      </label>
+      <label>説明
+        <input id="description" placeholder="例：求職者への直接の呼びかけ">
+      </label>
+      <label>尺の目安
+        <input id="duration" required placeholder="例：2〜3分">
+      </label>
+      <div class="checks">
+        <label><input type="radio" name="mode" value="split" checked>料金を2つ書く</label>
+        <label><input type="radio" name="mode" value="single">料金は1つ</label>
+      </div>
+      <div id="split-fields" class="row">
+        <label>インタビューのみ
+          <input id="interview" inputmode="numeric" placeholder="20万円。空欄は対象外">
+        </label>
+        <label>仕事風景の撮影込み
+          <input id="workplace" inputmode="numeric" placeholder="30万円。空欄は対象外">
+        </label>
+      </div>
+      <div id="single-fields">
+        <div class="row">
+          <label>料金
+            <input id="single" inputmode="numeric" placeholder="25万円">
+          </label>
+          <label>注記
+            <select id="note">
+              <option value="（一律）">一律</option>
+              <option value="（インサート込み）">インサート込み</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <label>参考動画のURL（あとからでも可）
+        <input id="item-video" type="url" placeholder="https://www.youtube.com/watch?v=...">
+      </label>
+      <button type="submit">追加する</button>
+    </form>
+
+    <h2>参考動画を追加</h2>
+    <p class="help">すでにある動画に、YouTubeのURLを貼ります。空欄にして公開すると、参考動画ボタンは出ません。</p>
+    <div id="video-list" class="panel"></div>
+
+    <button id="publish" type="button">公開する</button>
+    <p id="status" class="status"></p>
+  </main>
+  <script src="menu.js"></script>
+  <script>
+    var TOKEN_KEY = "fady-menu-token";
+    var state = { videos: {}, items: [] };
+
+    function token() {
+      return document.getElementById("token").value.trim();
+    }
+
+    function setStatus(message, isError) {
+      var status = document.getElementById("status");
+      status.textContent = message;
+      status.className = isError ? "status error" : "status";
+    }
+
+    function namesInUse() {
+      var names = MenuKit.base.map(function (item) { return item.name; });
+      state.items.forEach(function (item) { names.push(item.name); });
+      return names;
+    }
+
+    function renderVideos() {
+      var list = document.getElementById("video-list");
+      list.replaceChildren();
+      var groups = [
+        { id: "representative", label: "代表", rows: MenuKit.base.filter(function (item) { return item.category === "representative"; }) },
+        { id: "staff", label: "社員", rows: MenuKit.base.filter(function (item) { return item.category === "staff"; }) },
+        { id: "company", label: "会社", rows: MenuKit.base.filter(function (item) { return item.category === "company"; }) }
+      ];
+      groups.forEach(function (group) {
+        group.rows.forEach(function (item) { addVideoRow(list, item.name, group.label, false); });
+      });
+      state.items.forEach(function (item, index) {
+        addVideoRow(list, item.name, MenuKit.categories[item.category] + "・追加", true, index);
+      });
+    }
+
+    function addVideoRow(list, name, label, extra, index) {
+      var row = document.createElement("div");
+      row.className = "item";
+      var cat = document.createElement("p");
+      cat.className = "cat";
+      cat.textContent = label;
+      var title = document.createElement("h3");
+      title.textContent = name;
+      var field = document.createElement("label");
+      field.textContent = "参考動画のURL";
+      var input = document.createElement("input");
+      input.type = "url";
+      input.placeholder = "https://www.youtube.com/watch?v=...";
+      input.value = extra ? (state.items[index].video || "") : (state.videos[name] || "");
+      input.addEventListener("input", function () {
+        if (extra) state.items[index].video = input.value.trim();
+        else state.videos[name] = input.value.trim();
+      });
+      field.append(input);
+      row.append(cat, title, field);
+      if (extra) {
+        var remove = document.createElement("button");
+        remove.className = "linkish";
+        remove.type = "button";
+        remove.textContent = "この追加を取り消す";
+        remove.addEventListener("click", function () {
+          state.items.splice(index, 1);
+          renderVideos();
+        });
+        row.append(remove);
+      }
+      list.append(row);
+    }
+
+    function readMode() {
+      return document.querySelector("input[name=mode]:checked").value;
+    }
+
+    document.querySelectorAll("input[name=mode]").forEach(function (input) {
+      input.addEventListener("change", function () {
+        var single = readMode() === "single";
+        document.getElementById("split-fields").style.display = single ? "none" : "grid";
+        document.getElementById("single-fields").style.display = single ? "block" : "none";
+      });
+    });
+
+    document.getElementById("item-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      var name = document.getElementById("name").value.trim();
+      if (namesInUse().indexOf(name) !== -1) {
+        setStatus("同じ名前の動画がすでにあります。", true);
+        return;
+      }
+      var item = {
+        category: document.getElementById("category").value,
+        name: name,
+        description: document.getElementById("description").value.trim(),
+        duration: document.getElementById("duration").value.trim(),
+        video: document.getElementById("item-video").value.trim()
+      };
+      if (item.video && !MenuKit.safeUrl(item.video)) {
+        setStatus("参考動画は https で始まるURLにしてください。", true);
+        return;
+      }
+      if (readMode() === "single") {
+        item.single = document.getElementById("single").value.trim();
+        item.note = document.getElementById("note").value;
+        if (!MenuKit.yen(item.single)) {
+          setStatus("料金を入力してください。", true);
+          return;
+        }
+      } else {
+        item.interview = document.getElementById("interview").value.trim();
+        item.workplace = document.getElementById("workplace").value.trim();
+        if (!MenuKit.yen(item.interview) && !MenuKit.yen(item.workplace)) {
+          setStatus("料金をどちらか入力してください。空欄は対象外になります。", true);
+          return;
+        }
+      }
+      state.items.push(item);
+      event.target.reset();
+      document.querySelector("input[name=mode][value=split]").checked = true;
+      document.getElementById("split-fields").style.display = "grid";
+      document.getElementById("single-fields").style.display = "none";
+      renderVideos();
+      setStatus("追加しました。まだ公開前です。下の「公開する」を押すと料金表に出ます。", false);
+    });
+
+    document.getElementById("token-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!token()) {
+        setStatus("トークンを入力してください。", true);
+        return;
+      }
+      localStorage.setItem(TOKEN_KEY, token());
+      document.getElementById("token-state").textContent = "このブラウザに保存しました。";
+    });
+
+    document.getElementById("forget").addEventListener("click", function () {
+      localStorage.removeItem(TOKEN_KEY);
+      document.getElementById("token").value = "";
+      document.getElementById("token-state").textContent = "トークンを消しました。";
+    });
+
+    function toBase64(text) {
+      var bytes = new TextEncoder().encode(text);
+      var bin = "";
+      bytes.forEach(function (byte) { bin += String.fromCharCode(byte); });
+      return btoa(bin);
+    }
+
+    document.getElementById("publish").addEventListener("click", function () {
+      var savedToken = localStorage.getItem(TOKEN_KEY) || token();
+      if (!savedToken) {
+        setStatus("先にトークンを保存してください。", true);
+        document.getElementById("token").focus();
+        return;
+      }
+      var payload = {
+        videos: {},
+        items: state.items.map(function (item) {
+          var copy = {
+            category: item.category,
+            name: item.name,
+            description: item.description,
+            duration: item.duration,
+            video: MenuKit.safeUrl(item.video)
+          };
+          if (item.single) {
+            copy.single = MenuKit.yen(item.single);
+            copy.note = item.note;
+          } else {
+            copy.interview = MenuKit.yen(item.interview);
+            copy.workplace = MenuKit.yen(item.workplace);
+          }
+          return copy;
+        })
+      };
+      Object.keys(state.videos).forEach(function (name) {
+        payload.videos[name] = MenuKit.safeUrl(state.videos[name]);
+      });
+      setStatus("公開しています…", false);
+      var api = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
+      var headers = {
+        Accept: "application/vnd.github+json",
+        Authorization: "Bearer " + savedToken,
+        "X-GitHub-Api-Version": "2022-11-28"
+      };
+      fetch(api, { headers: headers })
+        .then(function (response) {
+          if (response.status === 404) return "";
+          if (!response.ok) throw new Error(String(response.status));
+          return response.json().then(function (data) { return data.sha; });
+        })
+        .then(function (sha) {
+          var body = {
+            message: "Update the price list from the browser editor.",
+            content: toBase64(JSON.stringify(payload, null, 2) + "\n")
+          };
+          if (sha) body.sha = sha;
+          return fetch(api, {
+            method: "PUT",
+            headers: Object.assign({ "Content-Type": "application/json" }, headers),
+            body: JSON.stringify(body)
+          });
+        })
+        .then(function (response) {
+          if (response.status === 401) throw new Error("トークンが違います。");
+          if (response.status === 403) throw new Error("このトークンでは保存できません。Contents の書き込み権限を確認してください。");
+          if (!response.ok) throw new Error("保存に失敗しました。");
+          setStatus("公開しました。1分ほどで料金表に反映されます。", false);
+        })
+        .catch(function (error) {
+          setStatus(error.message || "保存に失敗しました。", true);
+        });
+    });
+
+    var stored = localStorage.getItem(TOKEN_KEY) || "";
+    if (stored) {
+      document.getElementById("token").value = stored;
+      document.getElementById("token-state").textContent = "保存済みのトークンを使います。";
+    }
+
+    fetch("menu.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (response) { return response.ok ? response.json() : { videos: {}, items: [] }; })
+      .then(function (data) {
+        state.videos = Object.assign({
+          "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM"
+        }, data.videos || {});
+        state.items = data.items || [];
+        renderVideos();
+      })
+      .catch(function () { renderVideos(); });
+  </script>
+</body>
+</html>
