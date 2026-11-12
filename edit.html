@@ -98,6 +98,9 @@
       border-radius: 8px;
     }
     .token-panel p { margin: 0; color: var(--muted); font-size: 13px; }
+    .token-panel ol { margin: 10px 0 0; padding-left: 1.4em; color: var(--ink); font-size: 14px; }
+    .token-panel li { margin: 6px 0; }
+    .token-panel a { color: var(--green); font-weight: 700; }
     .token-panel label { display: block; margin-top: 12px; font-size: 14px; font-weight: 500; }
     .token-panel input {
       width: 100%;
@@ -310,11 +313,19 @@
     </nav>
   </div>
   <form id="token-panel" class="token-panel" hidden>
-    <p>トークンはこのブラウザだけに残ります。料金表のページには出ません。まだ無い場合は、<a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHubでトークンを作成</a>してください。対象リポジトリは recruit-video-menu、権限は Contents の Read and write です。</p>
+    <p>公開には、GitHubで新しく作るトークンが必要です。ログインパスワードとは別で、<strong>github_pat_</strong> で始まる長い文字列です。作った直後の画面で一度だけ表示され、あとから同じ文字列を見返すことはできません。いま入っている文字列を入れ直しても、拒否されたままです。</p>
+    <ol>
+      <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHubで新しいトークンを作る</a>を開く。ログインは ogawajimushoy-source です。</li>
+      <li>Token name に「料金表」など、分かる名前を入れる。</li>
+      <li>Repository access で Only select repositories を選び、recruit-video-menu だけにチェックを入れる。</li>
+      <li>Permissions を開き、Contents を Read and write にする。</li>
+      <li>Generate token を押し、表示された github_pat_ で始まる文字列をコピーする。</li>
+      <li>下の欄の中身を全部消して貼り、「このトークンを確認して保存」を押す。使えると出たら「公開する」を押す。</li>
+    </ol>
     <label>トークン
       <input id="editor-token" type="password" autocomplete="off" placeholder="github_pat_...">
     </label>
-    <button type="submit">このブラウザに保存</button>
+    <button type="submit">このトークンを確認して保存</button>
     <button id="forget" class="quiet" type="button">保存したトークンを消す</button>
     <p id="token-state"></p>
   </form>
@@ -322,6 +333,7 @@
   <script src="menu.js?v=5"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
+    var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
     var state = { videos: {}, items: [] };
     var tracked = {};
     var savedRaw = "";
@@ -352,6 +364,30 @@
 
     function token() {
       return document.getElementById("editor-token").value.trim();
+    }
+
+    function currentToken() {
+      var typed = token().replace(/\s+/g, "");
+      if (!typed) typed = (localStorage.getItem(TOKEN_KEY) || "").replace(/\s+/g, "");
+      document.getElementById("editor-token").value = typed;
+      if (typed && !tokenShapeMessage(typed)) localStorage.setItem(TOKEN_KEY, typed);
+      return typed;
+    }
+
+    function githubHeaders(savedToken) {
+      return {
+        Accept: "application/vnd.github+json",
+        Authorization: "Bearer " + savedToken,
+        "X-GitHub-Api-Version": "2022-11-28"
+      };
+    }
+
+    function tokenShapeMessage(value) {
+      if (!value) return "トークンが空です。GitHubで新しく作った github_pat_ で始まる文字列を貼ってください。";
+      if (value.indexOf("github_pat_") !== 0 && value.indexOf("ghp_") !== 0) {
+        return "この文字列はトークンではありません。GitHubのログインパスワードではなく、作成画面に一度だけ出る github_pat_ で始まる文字列を貼ってください。";
+      }
+      return "";
     }
 
     function rawSnapshot() {
@@ -785,13 +821,29 @@
 
     document.getElementById("token-panel").addEventListener("submit", function (event) {
       event.preventDefault();
-      if (!token()) {
-        setStatus("トークンを入力してください。", true);
+      var saved = currentToken();
+      var shape = tokenShapeMessage(saved);
+      if (shape) {
+        setStatus(shape, true);
+        showResult(shape, true);
         return;
       }
-      localStorage.setItem(TOKEN_KEY, token());
-      document.getElementById("token-state").textContent = "このブラウザに保存しました。";
-      setStatus("", false);
+      setStatus("トークンを確認しています…", false);
+      showResult("GitHubに、このトークンで入れるか確認しています…", false);
+      fetch(CONTENTS_API, { headers: githubHeaders(saved) })
+        .then(function (response) {
+          if (!response.ok) return apiError(response);
+          document.getElementById("token-state").textContent = "このトークンは使えます。";
+          setStatus("このトークンは使えます。公開するを押してください。", false);
+          showResult("このトークンは使えます。公開するを押してください。", false);
+        })
+        .catch(function (error) {
+          var text = error && error.message ? error.message : "トークンを確認できませんでした。";
+          if (text === "Failed to fetch") text = "GitHubに接続できませんでした。通信環境を確認して、もう一度押してください。";
+          document.getElementById("token-state").textContent = "このトークンは使えません。";
+          setStatus(text, true);
+          showResult(text, true);
+        });
     });
 
     document.getElementById("forget").addEventListener("click", function () {
@@ -819,7 +871,7 @@
     function apiError(response) {
       return response.json().catch(function () { return {}; }).then(function (data) {
         var detail = data && data.message ? "（" + data.message + "）" : "（" + response.status + "）";
-        if (response.status === 401) throw new Error("トークンが違います。保存の設定から、作り直したトークンを入れ直してください。" + detail);
+        if (response.status === 401) throw new Error("GitHubがこの文字列を拒否しました。同じ文字列を入れ直しても通りません。ログインは ogawajimushoy-source で、新しいトークンを作り、その場でコピーした github_pat_ で始まる文字列を貼ってください。" + detail);
         if (response.status === 403) throw new Error("このトークンでは保存できません。対象リポジトリ recruit-video-menu、Contents の Read and write を確認してください。" + detail);
         if (response.status === 409) throw new Error("他の更新と重なりました。もう一度「公開する」を押してください。" + detail);
         throw new Error("料金表の保存に失敗しました。" + detail);
@@ -859,11 +911,12 @@
         showResult(message, true);
         return;
       }
-      var savedToken = localStorage.getItem(TOKEN_KEY) || token();
-      if (!savedToken) {
+      var savedToken = currentToken();
+      var shape = tokenShapeMessage(savedToken);
+      if (shape) {
         document.getElementById("token-panel").hidden = false;
-        setStatus("先にトークンを保存してください。", true);
-        showResult("先に「保存の設定」でトークンを保存してください。", true);
+        setStatus(shape, true);
+        showResult(shape, true);
         document.getElementById("editor-token").focus();
         return;
       }
@@ -873,12 +926,8 @@
       publishing = true;
       setStatus("公開しています…", false);
       showResult("GitHubへ保存しています…", false);
-      var api = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
-      var headers = {
-        Accept: "application/vnd.github+json",
-        Authorization: "Bearer " + savedToken,
-        "X-GitHub-Api-Version": "2022-11-28"
-      };
+      var api = CONTENTS_API;
+      var headers = githubHeaders(savedToken);
       function putMenu(sha, attempt) {
         var body = {
           message: "Update the price list from the browser editor.",
