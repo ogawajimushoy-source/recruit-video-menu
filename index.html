@@ -817,7 +817,15 @@
       <p>株式会社ファディー</p>
     </div>
   </main>
-  <script src="menu.js"></script>
-  <script>MenuKit.load();</script>
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.src = "menu.js?t=" + Date.now();
+      script.onload = function () {
+        if (window.MenuKit) MenuKit.load();
+      };
+      document.body.appendChild(script);
+    })();
+  </script>
 </body>
 </html>

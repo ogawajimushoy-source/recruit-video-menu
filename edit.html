@@ -68,6 +68,17 @@
     }
     .bar-note:empty { display: none; }
     .bar-note.error { color: #ffd2c8; }
+    .bar-result {
+      flex-basis: 100%;
+      margin: 0;
+      padding: 10px 12px;
+      background: #fffcf8;
+      color: var(--ink);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .bar-result.error { background: #fff1ec; color: #8a3a2a; }
+    .bar-result a { color: var(--green); font-weight: 700; }
     .hint {
       width: min(920px, 100%);
       margin: 0 auto;
@@ -288,6 +299,7 @@
     </div>
     <p id="editor-status" class="bar-note" role="status"></p>
     <p id="editor-dirty" class="bar-note"></p>
+    <p id="publish-result" class="bar-result" hidden></p>
   </header>
   <div class="hint">
     <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。</p>
@@ -307,7 +319,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js"></script>
+  <script src="menu.js?v=5"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var state = { videos: {}, items: [] };
@@ -349,7 +361,7 @@
     function markDirty() {
       var dirty = rawSnapshot() !== savedRaw;
       document.getElementById("editor-dirty").textContent = dirty
-        ? "まだ公開前です。公開すると、1分ほどで料金表のURLに反映されます。"
+        ? "まだ公開前です。公開すると、この画面で反映できたか分かります。"
         : "";
     }
 
@@ -788,56 +800,139 @@
       document.getElementById("token-state").textContent = "トークンを消しました。";
     });
 
+    function showResult(message, isError, linkHref) {
+      var result = document.getElementById("publish-result");
+      result.className = isError ? "bar-result error" : "bar-result";
+      result.hidden = false;
+      result.textContent = message;
+      if (linkHref) {
+        result.append(document.createTextNode(" "));
+        var link = document.createElement("a");
+        link.href = linkHref;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "料金表を開く";
+        result.append(link);
+      }
+    }
+
+    function apiError(response) {
+      return response.json().catch(function () { return {}; }).then(function (data) {
+        var detail = data && data.message ? "（" + data.message + "）" : "（" + response.status + "）";
+        if (response.status === 401) throw new Error("トークンが違います。保存の設定から、作り直したトークンを入れ直してください。" + detail);
+        if (response.status === 403) throw new Error("このトークンでは保存できません。対象リポジトリ recruit-video-menu、Contents の Read and write を確認してください。" + detail);
+        if (response.status === 409) throw new Error("他の更新と重なりました。もう一度「公開する」を押してください。" + detail);
+        throw new Error("料金表の保存に失敗しました。" + detail);
+      });
+    }
+
+    function waitUntilLive(expected) {
+      var tries = 0;
+      function once() {
+        tries += 1;
+        return fetch("menu.json?t=" + Date.now(), { cache: "no-store" }).then(function (response) {
+          return response.ok ? response.text() : "";
+        }).then(function (text) {
+          var live = "";
+          try { live = JSON.stringify(JSON.parse(text)); } catch (error) { live = ""; }
+          if (live === expected) return true;
+          if (tries >= 18) return false;
+          setStatus("保存しました。料金表への反映を待っています…", false);
+          return new Promise(function (resolve) {
+            setTimeout(function () { resolve(once()); }, 5000);
+          });
+        }).catch(function () {
+          if (tries >= 18) return false;
+          return new Promise(function (resolve) {
+            setTimeout(function () { resolve(once()); }, 5000);
+          });
+        });
+      }
+      return once();
+    }
+
     document.getElementById("editor-publish").addEventListener("click", function () {
       if (publishing) return;
       var message = validateAll();
       if (message) {
         setStatus(message, true);
+        showResult(message, true);
         return;
       }
       var savedToken = localStorage.getItem(TOKEN_KEY) || token();
       if (!savedToken) {
         document.getElementById("token-panel").hidden = false;
         setStatus("先にトークンを保存してください。", true);
+        showResult("先に「保存の設定」でトークンを保存してください。", true);
         document.getElementById("editor-token").focus();
         return;
       }
+      var payload = buildPayload();
+      var expected = JSON.stringify(payload);
+      var fileText = JSON.stringify(payload, null, 2) + "\n";
       publishing = true;
       setStatus("公開しています…", false);
+      showResult("GitHubへ保存しています…", false);
       var api = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
       var headers = {
         Accept: "application/vnd.github+json",
         Authorization: "Bearer " + savedToken,
         "X-GitHub-Api-Version": "2022-11-28"
       };
-      fetch(api, { headers: headers, cache: "no-store" })
+      function putMenu(sha, attempt) {
+        var body = {
+          message: "Update the price list from the browser editor.",
+          content: toBase64(fileText),
+          branch: "main"
+        };
+        if (sha) body.sha = sha;
+        return fetch(api, {
+          method: "PUT",
+          headers: Object.assign({ "Content-Type": "application/json" }, headers),
+          body: JSON.stringify(body)
+        }).then(function (response) {
+          if (response.status === 409 && attempt < 2) {
+            return fetch(api, { headers: headers }).then(function (again) {
+              if (!again.ok) return apiError(again);
+              return again.json().then(function (data) { return putMenu(data.sha || "", attempt + 1); });
+            });
+          }
+          if (!response.ok) return apiError(response);
+          return response.json();
+        });
+      }
+      fetch(api, { headers: headers })
         .then(function (response) {
           if (response.status === 404) return "";
-          if (!response.ok) throw new Error(String(response.status));
-          return response.json().then(function (data) { return data.sha; });
+          if (!response.ok) return apiError(response);
+          return response.json().then(function (data) { return data.sha || ""; });
         })
-        .then(function (sha) {
-          var body = {
-            message: "Update the price list from the browser editor.",
-            content: toBase64(JSON.stringify(buildPayload(), null, 2) + "\n")
-          };
-          if (sha) body.sha = sha;
-          return fetch(api, {
-            method: "PUT",
-            headers: Object.assign({ "Content-Type": "application/json" }, headers),
-            body: JSON.stringify(body)
-          });
-        })
-        .then(function (response) {
-          if (response.status === 401) throw new Error("トークンが違います。");
-          if (response.status === 403) throw new Error("このトークンでは保存できません。Contents の書き込み権限を確認してください。");
-          if (!response.ok) throw new Error("保存に失敗しました。");
+        .then(function (sha) { return putMenu(sha, 1); })
+        .then(function (data) {
+          if (!data || !data.commit || !data.commit.sha) {
+            throw new Error("保存できたか確認できませんでした。もう一度公開してください。");
+          }
           savedRaw = rawSnapshot();
           markDirty();
-          setStatus("公開しました。1分ほどで料金表に反映されます。", false);
+          setStatus("保存しました。料金表への反映を待っています…", false);
+          showResult("保存しました。料金表に出るまで、この画面で確認しています。", false);
+          return waitUntilLive(expected);
+        })
+        .then(function (live) {
+          var href = "./?t=" + Date.now();
+          if (live) {
+            setStatus("料金表に反映されました。", false);
+            showResult("料金表に反映されました。", false, href);
+          } else {
+            setStatus("保存はできました。反映の確認がタイムアウトしました。", true);
+            showResult("保存はできています。料金表を開き直してください。", true, href);
+          }
         })
         .catch(function (error) {
-          setStatus(error.message || "保存に失敗しました。", true);
+          var text = error && error.message ? error.message : "保存に失敗しました。";
+          if (text === "Failed to fetch") text = "公開先に接続できませんでした。通信環境とトークンを確認して、もう一度公開してください。";
+          setStatus(text, true);
+          showResult(text, true);
         })
         .then(function () { publishing = false; });
     });
