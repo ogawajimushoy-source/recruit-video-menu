@@ -192,7 +192,12 @@
       text-decoration: underline;
       text-underline-offset: 3px;
     }
-    #stage .do-remove { color: var(--muted); }
+    #stage .do-remove {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      text-decoration: none;
+    }
     #stage .do-add {
       padding: 8px 14px;
       border: 0;
@@ -305,7 +310,7 @@
     <p id="publish-result" class="bar-result" hidden></p>
   </header>
   <div class="hint">
-    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。「この行を消す」で、もともとある項目も消せます。</p>
+    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。「×」で、もともとある項目も消せます。</p>
     <nav>
       <a href="#representative">代表</a>
       <a href="#staff">社員</a>
@@ -635,7 +640,7 @@
           paint();
           markDirty();
         }),
-        button("text-btn do-remove", "この行を消す", function () {
+        button("text-btn do-remove", "×", function () {
           state.items.splice(Number(tr.dataset.index), 1);
           paint();
           markDirty();
@@ -1217,7 +1222,7 @@
         button("text-btn move-up", "上へ", function () { moveRow(tr, -1); }),
         button("text-btn move-down", "下へ", function () { moveRow(tr, 1); })
       );
-      tools.append(button("text-btn do-remove", "この行を消す", function () {
+      var remove = button("text-btn do-remove", "×", function () {
         var section = tr.closest("section");
         if (tr.dataset.extra !== "1") removed[tr.dataset.id] = true;
         delete state.videos[tr.dataset.id];
@@ -1227,7 +1232,10 @@
         });
         tr.remove();
         markDirty();
-      }));
+      });
+      remove.title = "この行を消す";
+      remove.setAttribute("aria-label", "この行を消す");
+      tools.append(remove);
       th.insertBefore(tools, th.firstChild);
       bindEdit(tr.querySelector(".name"), "name");
       bindEdit(tr.querySelector(".desc"), "desc");

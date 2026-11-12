@@ -135,6 +135,20 @@
       letter-spacing: 0.05em;
       line-height: 1.4;
     }
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 4px 24px;
+    }
+    .section-head p {
+      margin: 0 0 0 auto;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      text-align: right;
+    }
     .section-lead {
       margin: 12px 0 0;
       color: #3a3834;
@@ -171,30 +185,6 @@
       font-size: 14px;
       line-height: 1.7;
     }
-    .inserts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin: 28px 0 8px;
-    }
-    .inserts article {
-      margin: 0;
-      padding: 20px 20px 18px;
-      background: var(--card);
-      border: 1px solid #e4ddd2;
-      border-radius: 8px;
-    }
-    .inserts h3 {
-      margin: 0;
-      color: var(--ink);
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .inserts p {
-      margin: 8px 0 0;
-      color: #3a3834;
-      font-size: 14px;
-    }
     .menu-block { margin-top: 34px; }
     .menu-block h3 {
       margin: 0 0 12px;
@@ -218,15 +208,19 @@
       vertical-align: bottom;
     }
     thead th.num {
-      padding: 10px 0 10px 8px;
+      padding: 0;
+      background: #efeae1;
       color: var(--ink);
       text-align: right;
       white-space: nowrap;
     }
+    thead th.num .pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
     thead th.num .col-label {
-      display: inline-block;
-      padding: 6px 12px;
-      background: #efeae1;
+      display: block;
+      padding: 8px 12px;
       line-height: 1.4;
     }
     tbody th, tbody td {
@@ -422,7 +416,7 @@
       h2 { font-size: 28px; }
     }
     @media (max-width: 599px) {
-      .aims, .choices, .inserts, .series, .series-prices { grid-template-columns: 1fr; }
+      .aims, .choices, .series, .series-prices { grid-template-columns: 1fr; }
       .table-wrap { display: none; }
       .cards { display: block; }
       h1 { font-size: 32px; }
@@ -464,16 +458,9 @@
 
     <hr class="rule">
 
-    <h2>単品メニュー</h2>
-    <div class="inserts">
-      <article>
-        <h3>インサートなし</h3>
-        <p>人物へのインタビューを中心に構成した動画です。</p>
-      </article>
-      <article>
-        <h3>インサートあり</h3>
-        <p>インタビューに加え、オフィスや仕事中の様子を撮影し、映像に組み込みます。</p>
-      </article>
+    <div class="section-head">
+      <h2>単品メニュー</h2>
+      <p>インサート：オフィスや仕事風景の映像を差し込む追加撮影</p>
     </div>
 
     <section class="menu-block" id="representative">
@@ -490,8 +477,7 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col"><span class="col-label">インサートなし</span></th>
-              <th class="num" scope="col"><span class="col-label">インサートあり</span></th>
+              <th class="num" scope="colgroup" colspan="2"><span class="pair"><span class="col-label">インサートなし</span><span class="col-label">インサートあり</span></span></th>
             </tr>
           </thead>
           <tbody>
@@ -573,8 +559,7 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col"><span class="col-label">インサートなし</span></th>
-              <th class="num" scope="col"><span class="col-label">インサートあり</span></th>
+              <th class="num" scope="colgroup" colspan="2"><span class="pair"><span class="col-label">インサートなし</span><span class="col-label">インサートあり</span></span></th>
             </tr>
           </thead>
           <tbody>
@@ -696,8 +681,7 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col"><span class="col-label">インサートなし</span></th>
-              <th class="num" scope="col"><span class="col-label">インサートあり</span></th>
+              <th class="num" scope="colgroup" colspan="2"><span class="pair"><span class="col-label">インサートなし</span><span class="col-label">インサートあり</span></span></th>
             </tr>
           </thead>
           <tbody>
