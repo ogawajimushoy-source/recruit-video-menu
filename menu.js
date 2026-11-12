@@ -5,6 +5,8 @@
     company: "会社"
   };
 
+  var PRICE_LABELS = ["インタビュー", "インタビュー＋インサート"];
+
   var BASE = [
     { category: "representative", name: "代表者メッセージ" },
     { category: "representative", name: "事業計画" },
@@ -20,6 +22,15 @@
     { category: "company", name: "ルームツアー" }
   ];
 
+  function findTagged(selector, id) {
+    var nodes = document.querySelectorAll(selector);
+    var i;
+    for (i = 0; i < nodes.length; i++) {
+      if (nodes[i].dataset.id === id) return nodes[i];
+    }
+    return null;
+  }
+
   function safeUrl(value) {
     try {
       var url = new URL(String(value || "").trim());
@@ -31,11 +42,23 @@
   }
 
   function yen(value) {
-    var text = String(value || "").trim();
+    var text = String(value || "").replace(/[０-９]/g, function (ch) {
+      return String.fromCharCode(ch.charCodeAt(0) - 65248);
+    }).trim();
     if (!text || text === "対象外") return "";
     if (/^\d+(?:\.\d+)?$/.test(text)) return text + "万円";
     if (/^\d+(?:\.\d+)?万$/.test(text)) return text + "円";
     return text;
+  }
+
+  function showPrice(value) {
+    var text = yen(value);
+    if (!text) return { text: "対象外", empty: true };
+    return { text: text, empty: false };
+  }
+
+  function isSingle(fields) {
+    return !!fields && Object.prototype.hasOwnProperty.call(fields, "single");
   }
 
   function setVideo(host, url) {
@@ -59,31 +82,92 @@
     current.href = url;
   }
 
-  function priceNode(value) {
+  function setPriceCell(cell, value) {
+    var shown = showPrice(value);
+    cell.classList.toggle("na", shown.empty);
+    cell.textContent = shown.text;
+  }
+
+  function priceLine(label, value) {
+    var line = document.createElement("p");
+    var span = document.createElement("span");
+    span.textContent = label;
+    var shown = showPrice(value);
     var strong = document.createElement("strong");
-    if (!value) {
-      strong.className = "na";
-      strong.textContent = "対象外";
-      return strong;
+    if (shown.empty) strong.className = "na";
+    strong.textContent = shown.text;
+    line.append(span, strong);
+    return line;
+  }
+
+  function writePrices(tr, fields) {
+    var cells = [];
+    Array.prototype.forEach.call(tr.children, function (child) {
+      if (child.classList.contains("price")) cells.push(child);
+    });
+    if (!cells.length) return;
+    if (isSingle(fields)) {
+      if (cells[1]) cells[1].remove();
+      cells[0].colSpan = 2;
+      setPriceCell(cells[0], fields.single);
+      return;
     }
-    strong.textContent = value;
-    return strong;
+    if (cells.length === 1) {
+      cells[0].colSpan = 1;
+      var second = document.createElement("td");
+      second.className = "price";
+      cells[0].after(second);
+      cells.push(second);
+    }
+    setPriceCell(cells[0], fields.interview);
+    setPriceCell(cells[1], fields.workplace);
+  }
+
+  function writeRow(tr, fields) {
+    if (!tr || !fields) return;
+    if (fields.name != null && tr.querySelector(".name")) tr.querySelector(".name").textContent = fields.name;
+    if (fields.description != null && tr.querySelector(".desc")) tr.querySelector(".desc").textContent = fields.description;
+    if (fields.duration != null && tr.querySelector("td.duration")) tr.querySelector("td.duration").textContent = fields.duration;
+    if (isSingle(fields) || fields.interview != null || fields.workplace != null) writePrices(tr, fields);
+  }
+
+  function writeCard(card, fields) {
+    if (!card || !fields) return;
+    if (fields.name != null && card.querySelector("h4")) card.querySelector("h4").textContent = fields.name;
+    if (fields.description != null && card.querySelector(".desc")) card.querySelector(".desc").textContent = fields.description;
+    if (fields.duration != null && card.querySelector(".meta")) card.querySelector(".meta").textContent = "動画の尺：" + fields.duration;
+    if (!isSingle(fields) && fields.interview == null && fields.workplace == null) return;
+    var prices = card.querySelector(".card-prices");
+    if (!prices) return;
+    prices.textContent = "";
+    if (isSingle(fields)) {
+      var text = yen(fields.single);
+      if (fields.note && text.indexOf(fields.note) === -1) text += fields.note;
+      prices.append(priceLine("料金", text));
+      return;
+    }
+    prices.append(priceLine(PRICE_LABELS[0], fields.interview));
+    prices.append(priceLine(PRICE_LABELS[1], fields.workplace));
+  }
+
+  function applyFields(id, fields) {
+    writeRow(findTagged("tr[data-id]", id), fields);
+    writeCard(findTagged("article[data-id]", id), fields);
   }
 
   function appendItem(item) {
     var section = document.getElementById(item.category);
     if (!section) return;
+    var id = item.id || item.name;
     var url = safeUrl(item.video);
-    var interview = yen(item.interview);
-    var workplace = yen(item.workplace);
-
     var row = document.createElement("tr");
-    row.setAttribute("data-extra", "1");
+    row.dataset.id = id;
+    row.dataset.extra = "1";
     var heading = document.createElement("th");
     heading.scope = "row";
     var name = document.createElement("span");
     name.className = "name";
-    name.textContent = item.name;
+    name.textContent = item.name || "";
     var desc = document.createElement("span");
     desc.className = "desc";
     desc.textContent = item.description || "";
@@ -93,24 +177,19 @@
     duration.className = "duration";
     duration.textContent = item.duration || "";
     row.append(heading, duration);
-
-    if (item.single) {
+    if (isSingle(item) || item.single) {
       var single = document.createElement("td");
       single.className = "price";
       single.colSpan = 2;
-      single.append(document.createTextNode(yen(item.single)));
-      if (item.note) {
-        var unit = document.createElement("span");
-        unit.className = "unit";
-        unit.textContent = item.note;
-        single.append(unit);
-      }
+      var singleText = yen(item.single);
+      if (item.note && singleText.indexOf(item.note) === -1) singleText += item.note;
+      setPriceCell(single, singleText);
       row.append(single);
     } else {
-      [interview, workplace].forEach(function (value) {
+      [item.interview, item.workplace].forEach(function (value) {
         var cell = document.createElement("td");
-        cell.className = value ? "price" : "price na";
-        cell.textContent = value || "対象外";
+        cell.className = "price";
+        setPriceCell(cell, value);
         row.append(cell);
       });
     }
@@ -118,9 +197,10 @@
 
     var card = document.createElement("article");
     card.className = "card";
-    card.setAttribute("data-extra", "1");
+    card.dataset.id = id;
+    card.dataset.extra = "1";
     var title = document.createElement("h4");
-    title.textContent = item.name;
+    title.textContent = item.name || "";
     var cardDesc = document.createElement("p");
     cardDesc.className = "desc";
     cardDesc.textContent = item.description || "";
@@ -129,51 +209,76 @@
     meta.textContent = "動画の尺：" + (item.duration || "");
     var prices = document.createElement("div");
     prices.className = "card-prices";
-    if (item.single) {
-      var line = document.createElement("p");
-      var label = document.createElement("span");
-      label.textContent = "料金";
-      var amount = document.createElement("strong");
-      amount.textContent = yen(item.single);
-      if (item.note) {
-        var note = document.createElement("span");
-        note.className = "unit";
-        note.textContent = item.note;
-        amount.append(note);
-      }
-      line.append(label, amount);
-      prices.append(line);
-    } else {
-      [
-        ["インタビューのみ", interview],
-        ["仕事風景の撮影込み", workplace]
-      ].forEach(function (pair) {
-        var line = document.createElement("p");
-        var label = document.createElement("span");
-        label.textContent = pair[0];
-        line.append(label, priceNode(pair[1]));
-        prices.append(line);
-      });
-    }
+    card.append(title, cardDesc, meta, prices);
+    writeCard(card, item.single ? { single: item.single, note: item.note } : { interview: item.interview, workplace: item.workplace });
     var tax = document.createElement("p");
     tax.className = "tax-note";
     tax.textContent = "税別";
-    card.append(title, cardDesc, meta, prices, tax);
+    card.append(tax);
     if (url) setVideo(card, url);
     section.querySelector(".cards").append(card);
   }
 
+  function stampBase() {
+    BASE.forEach(function (item) {
+      var section = document.getElementById(item.category);
+      if (!section) return;
+      section.querySelectorAll("tbody tr").forEach(function (tr) {
+        if (tr.dataset.id) return;
+        var name = tr.querySelector(".name");
+        if (name && name.textContent.trim() === item.name) tr.dataset.id = item.name;
+      });
+      section.querySelectorAll(".cards article").forEach(function (card) {
+        if (card.dataset.id) return;
+        var title = card.querySelector("h4");
+        if (title && title.textContent.trim() === item.name) card.dataset.id = item.name;
+      });
+    });
+  }
+
+  function reorder(container, ids) {
+    if (!container || !ids) return;
+    var rank = {};
+    ids.forEach(function (id, index) { rank[id] = index; });
+    var rows = Array.prototype.filter.call(container.children, function (node) {
+      return node.dataset && node.dataset.id;
+    });
+    rows.forEach(function (row, index) {
+      if (!Object.prototype.hasOwnProperty.call(rank, row.dataset.id)) rank[row.dataset.id] = 1000 + index;
+    });
+    rows.sort(function (a, b) { return rank[a.dataset.id] - rank[b.dataset.id]; });
+    rows.forEach(function (row) { container.appendChild(row); });
+  }
+
+  function applyVideos(videos) {
+    document.querySelectorAll("tr[data-id], article.card[data-id]").forEach(function (node) {
+      var id = node.dataset.id;
+      var nameEl = node.querySelector(".name, h4");
+      var name = nameEl ? nameEl.textContent.trim() : "";
+      var hasId = Object.prototype.hasOwnProperty.call(videos, id);
+      var hasName = !!name && Object.prototype.hasOwnProperty.call(videos, name);
+      if (!hasId && !hasName) return;
+      var host = node.tagName === "TR" ? node.querySelector("th") : node;
+      setVideo(host, safeUrl(hasId ? videos[id] : videos[name]));
+    });
+  }
+
   function apply(data) {
-    document.querySelectorAll("[data-extra]").forEach(function (node) {
-      node.remove();
-    });
-    var videos = data.videos || {};
-    document.querySelectorAll(".name, article.card > h4").forEach(function (nameEl) {
-      var name = nameEl.textContent.trim();
-      if (!Object.prototype.hasOwnProperty.call(videos, name)) return;
-      setVideo(nameEl.closest("tr, article.card"), safeUrl(videos[name]));
-    });
+    data = data || {};
+    document.querySelectorAll("[data-extra]").forEach(function (node) { node.remove(); });
+    stampBase();
+    var overrides = data.overrides || {};
+    Object.keys(overrides).forEach(function (id) { applyFields(id, overrides[id]); });
     (data.items || []).forEach(appendItem);
+    var order = data.order || {};
+    Object.keys(CATEGORIES).forEach(function (category) {
+      if (!order[category]) return;
+      var section = document.getElementById(category);
+      if (!section) return;
+      reorder(section.querySelector("tbody"), order[category]);
+      reorder(section.querySelector(".cards"), order[category]);
+    });
+    applyVideos(data.videos || {});
   }
 
   function load() {
@@ -191,6 +296,9 @@
     base: BASE,
     safeUrl: safeUrl,
     yen: yen,
+    showPrice: showPrice,
+    apply: apply,
+    addItem: appendItem,
     load: load
   };
 })();

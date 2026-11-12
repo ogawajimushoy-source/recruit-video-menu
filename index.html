@@ -105,9 +105,19 @@
       display: block;
       margin-top: 8px;
       font-family: "Shippori Mincho", "Yu Mincho", serif;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
+      line-height: 1.5;
+    }
+    .aims em {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-style: normal;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.6;
     }
     .rule { margin: 48px 0 36px; border: 0; border-top: 1px solid #cfc8bc; }
     .section-label {
@@ -425,40 +435,39 @@
     <p class="promise">会社の魅力を、伝わる映像に。</p>
     <p class="lead">企業の想いや働く人の姿、仕事の魅力を伝える採用動画をご提案します。</p>
     <ul class="aims">
-      <li><a href="#representative"><span>代表・経営者</span><strong>想いを伝える</strong></a></li>
-      <li><a href="#staff"><span>社員・職場</span><strong>人柄を伝える</strong></a></li>
-      <li><a href="#company"><span>会社・仕事</span><strong>事業を伝える</strong></a></li>
+      <li>
+        <a href="#representative">
+          <span>代表・経営者</span>
+          <strong>経営者の想いや会社の方向性を伝えたい</strong>
+          <em>代表者メッセージ、事業計画、代表が語るシリーズ</em>
+        </a>
+      </li>
+      <li>
+        <a href="#staff">
+          <span>社員・職場</span>
+          <strong>一緒に働く社員の人柄を伝えたい</strong>
+          <em>社員紹介、社員同士の対談、座談会</em>
+        </a>
+      </li>
+      <li>
+        <a href="#company">
+          <span>会社・仕事</span>
+          <strong>会社の雰囲気や仕事内容を伝えたい</strong>
+          <em>会社紹介、事業内容紹介、福利厚生紹介、ルームツアー</em>
+        </a>
+      </li>
     </ul>
-
-    <hr class="rule">
-
-    <h2>どんなことを伝えたいですか？</h2>
-    <p class="section-lead">伝えたいことから、動画の種類を選べます。</p>
-    <div class="choices">
-      <a href="#representative">
-        <h3>経営者の想いや会社の方向性を伝えたい</h3>
-        <p>代表者メッセージ、事業計画、代表が語るシリーズ</p>
-      </a>
-      <a href="#staff">
-        <h3>一緒に働く社員の人柄を伝えたい</h3>
-        <p>社員紹介、社員同士の対談、座談会</p>
-      </a>
-      <a href="#company">
-        <h3>会社の雰囲気や仕事内容を伝えたい</h3>
-        <p>会社紹介、事業内容紹介、福利厚生紹介、ルームツアー</p>
-      </a>
-    </div>
 
     <hr class="rule">
 
     <h2>単品メニュー</h2>
     <div class="inserts">
       <article>
-        <h3>インタビューのみ</h3>
+        <h3>インタビュー</h3>
         <p>人物へのインタビューを中心に構成した動画です。</p>
       </article>
       <article>
-        <h3>インタビュー＋仕事風景の撮影</h3>
+        <h3>インタビュー＋インサート</h3>
         <p>インタビューに加え、オフィスや仕事中の様子を撮影し、映像に組み込みます。</p>
       </article>
     </div>
@@ -471,8 +480,8 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インタビューのみ<span>税別</span></th>
-              <th class="num" scope="col">仕事風景の撮影込み<span>税別</span></th>
+              <th class="num" scope="col">インタビュー<span>税別</span></th>
+              <th class="num" scope="col">インタビュー＋インサート<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
@@ -512,8 +521,8 @@
           <p class="desc">求職者への直接の呼びかけ</p>
           <p class="meta">動画の尺：2〜3分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>20万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>30万円</strong></p>
+            <p><span>インタビュー</span><strong>20万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>30万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -522,8 +531,8 @@
           <p class="desc">これからの事業と成長の道筋</p>
           <p class="meta">動画の尺：3〜5分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>25万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>35万円</strong></p>
+            <p><span>インタビュー</span><strong>25万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>35万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -532,8 +541,8 @@
           <p class="desc">人柄がテンポよく伝わる</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>35万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong class="na">対象外</strong></p>
+            <p><span>インタビュー</span><strong>35万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong class="na">対象外</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -548,8 +557,8 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インタビューのみ<span>税別</span></th>
-              <th class="num" scope="col">仕事風景の撮影込み<span>税別</span></th>
+              <th class="num" scope="col">インタビュー<span>税別</span></th>
+              <th class="num" scope="col">インタビュー＋インサート<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
@@ -609,8 +618,8 @@
           <p class="meta">動画の尺：2〜3分</p>
           <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>20万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>30万円</strong></p>
+            <p><span>インタビュー</span><strong>20万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>30万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -619,8 +628,8 @@
           <p class="desc">等身大の社員像がテンポよく伝わる</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>35万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong class="na">対象外</strong></p>
+            <p><span>インタビュー</span><strong>35万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong class="na">対象外</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -629,8 +638,8 @@
           <p class="desc">代表と現場の距離感</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>30万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>40万円</strong></p>
+            <p><span>インタビュー</span><strong>30万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>40万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -639,8 +648,8 @@
           <p class="desc">同期・先輩後輩・部署を越えた関係性</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>30万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>40万円</strong></p>
+            <p><span>インタビュー</span><strong>30万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>40万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -649,8 +658,8 @@
           <p class="desc">社内の空気感と人のつながり</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>30万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>40万円</strong></p>
+            <p><span>インタビュー</span><strong>30万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>40万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -665,8 +674,8 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インタビューのみ<span>税別</span></th>
-              <th class="num" scope="col">仕事風景の撮影込み<span>税別</span></th>
+              <th class="num" scope="col">インタビュー<span>税別</span></th>
+              <th class="num" scope="col">インタビュー＋インサート<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
@@ -730,8 +739,8 @@
           <p class="desc">制度を、使っている社員の声とともに</p>
           <p class="meta">動画の尺：3〜5分</p>
           <div class="card-prices">
-            <p><span>インタビューのみ</span><strong>25万円</strong></p>
-            <p><span>仕事風景の撮影込み</span><strong>35万円</strong></p>
+            <p><span>インタビュー</span><strong>25万円</strong></p>
+            <p><span>インタビュー＋インサート</span><strong>35万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -794,7 +803,7 @@
     <hr class="rule">
 
     <h2>追加料金・注意事項</h2>
-    <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インタビューのみか仕事風景の撮影を含むかの範囲です。次のものは別途です。</p>
+    <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インタビューか、インタビュー＋インサートかの範囲です。次のものは別途です。</p>
     <ul class="notes">
       <li>この範囲を超える撮影</li>
       <li>遠方の交通・宿泊</li>

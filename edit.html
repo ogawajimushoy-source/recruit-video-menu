@@ -109,7 +109,8 @@
     body.editing .table-wrap table { min-width: 760px; }
     body.editing #stage tbody th,
     body.editing #stage tbody td { vertical-align: top; }
-    body.editing #stage th[scope="row"] { width: 46%; }
+    body.editing #stage thead th:nth-child(2),
+    body.editing #stage td.duration { white-space: nowrap; }
     #stage .video-slot {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -210,6 +211,21 @@
       font-size: 15px;
     }
     #stage .add-video:hover, #stage .add-video:focus { background: #f7fbf8; }
+    #stage .can-edit { cursor: text; border-radius: 4px; }
+    #stage .can-edit:hover { box-shadow: inset 0 -1px 0 var(--green); }
+    #stage .inline-edit {
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid var(--green);
+      background: #fff;
+      color: inherit;
+      font: inherit;
+      padding: 0;
+    }
+    #stage td.price .inline-edit { font-size: 24px; font-weight: 700; text-align: right; }
+    #stage .row-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; }
+    #stage .grip { cursor: grab; color: var(--muted); font-size: 13px; }
+    #stage tr.drop-target { outline: 2px solid var(--green); outline-offset: -2px; }
     @media (max-width: 700px) {
       body.editing .table-wrap { overflow: visible; }
       body.editing .table-wrap table,
@@ -244,10 +260,11 @@
         letter-spacing: 0.06em;
       }
       body.editing #stage td.duration::before { content: "尺の目安"; }
-      body.editing #stage td.price:nth-child(3)::before { content: "インタビューのみ"; }
-      body.editing #stage td.price:nth-child(4)::before { content: "仕事風景の撮影込み"; }
+      body.editing #stage td.price:nth-child(3)::before { content: "インタビュー"; }
+      body.editing #stage td.price:nth-child(4)::before { content: "インタビュー＋インサート"; }
       body.editing #stage td.price[colspan="2"]::before { content: "料金"; }
-      body.editing #stage .price-input { text-align: left; }
+      body.editing #stage .price-input,
+      body.editing #stage td.price .inline-edit { text-align: left; }
       body.editing #stage .single-line { justify-content: flex-start; }
     }
   </style>
@@ -264,7 +281,7 @@
     <p id="editor-dirty" class="bar-note"></p>
   </header>
   <div class="hint">
-    <p>お客さまに見せる料金表です。各行の「参考動画」にURLを貼れます。表の下の「＋ 動画を追加」で、新しい行を入れられます。</p>
+    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。</p>
     <nav>
       <a href="#representative">代表</a>
       <a href="#staff">社員</a>
@@ -317,7 +334,7 @@
     }
 
     function rawSnapshot() {
-      return JSON.stringify({ videos: state.videos, items: state.items });
+      return JSON.stringify(collect());
     }
 
     function markDirty() {
@@ -379,12 +396,8 @@
     }
 
     function buildPayload() {
-      var payload = { videos: {}, items: state.items.map(copyItem) };
-      Object.keys(state.videos).forEach(function (name) {
-        var url = MenuKit.safeUrl(state.videos[name]);
-        if (url || tracked[name]) payload.videos[name] = url;
-      });
-      return payload;
+      commitOpen();
+      return collect();
     }
 
     function videoSlot(value, onInput) {
@@ -490,8 +503,8 @@
         return;
       }
       [
-        [item.interview || "", "インタビューのみ"],
-        [item.workplace || "", "仕事風景の撮影込み"]
+        [item.interview || "", "インタビュー"],
+        [item.workplace || "", "インタビュー＋インサート"]
       ].forEach(function (pair) {
         var cell = el("td", "price");
         var price = textInput("price-input", pair[0], "対象外", pair[1]);
@@ -726,20 +739,21 @@
     }
 
     function validateAll() {
-      var draft = document.querySelector("#stage tr.draft");
-      if (draft && draftHasText(draft)) return "追加中の行があります。「この行を入れる」を押してから公開してください。";
-      var i;
-      for (i = 0; i < MenuKit.base.length; i++) {
-        var name = MenuKit.base[i].name;
-        if (state.videos[name] && !MenuKit.safeUrl(state.videos[name])) {
-          return name + "の参考動画は https で始まるURLにしてください。";
-        }
-      }
-      for (i = 0; i < state.items.length; i++) {
-        var message = validateItem(state.items[i], i);
-        if (message) return message;
-      }
-      return "";
+      commitOpen();
+      var names = [];
+      var message = "";
+      eachMenuRow(function (tr) {
+        if (message) return;
+        var fields = readRow(tr);
+        var video = (tr.querySelector(".video-input") || {}).value || "";
+        video = video.trim();
+        if (!fields.name) message = "動画の名前を入力してください。";
+        else if (names.indexOf(fields.name) !== -1) message = "同じ名前の動画がすでにあります。";
+        else if (!fields.duration) message = fields.name + "の尺を入力してください。";
+        else if (video && !MenuKit.safeUrl(video)) message = fields.name + "の参考動画は https で始まるURLにしてください。";
+        else names.push(fields.name);
+      });
+      return message;
     }
 
     document.getElementById("token-toggle").addEventListener("click", function () {
@@ -809,9 +823,6 @@
           if (response.status === 401) throw new Error("トークンが違います。");
           if (response.status === 403) throw new Error("このトークンでは保存できません。Contents の書き込み権限を確認してください。");
           if (!response.ok) throw new Error("保存に失敗しました。");
-          normalizeState();
-          paint();
-          refreshBaseLinks();
           savedRaw = rawSnapshot();
           markDirty();
           setStatus("公開しました。1分ほどで料金表に反映されます。", false);
@@ -837,6 +848,313 @@
       document.getElementById("token-panel").hidden = false;
     }
 
+    function commitOpen() {
+      var active = document.querySelector("#stage .inline-edit");
+      if (active) active.blur();
+    }
+
+    function eachMenuRow(fn) {
+      ["representative", "staff", "company"].forEach(function (category) {
+        document.querySelectorAll("#" + category + " tbody tr[data-id]").forEach(function (tr) {
+          fn(tr, category);
+        });
+      });
+    }
+
+    function readRow(tr) {
+      var cells = [];
+      Array.prototype.forEach.call(tr.children, function (child) {
+        if (child.classList.contains("price")) cells.push(child);
+      });
+      var fields = {
+        name: tr.querySelector(".name") ? tr.querySelector(".name").textContent.trim() : "",
+        description: tr.querySelector(".desc") ? tr.querySelector(".desc").textContent.trim() : "",
+        duration: tr.querySelector("td.duration") ? tr.querySelector("td.duration").textContent.trim() : ""
+      };
+      if (cells.length === 1) fields.single = cells[0].textContent.trim();
+      else {
+        fields.interview = cells[0] ? cells[0].textContent.trim() : "";
+        fields.workplace = cells[1] ? cells[1].textContent.trim() : "";
+      }
+      return fields;
+    }
+
+    function priceValue(text) {
+      return MenuKit.yen(text === "対象外" ? "" : text) || "対象外";
+    }
+
+    function collect() {
+      var payload = {
+        videos: {},
+        items: [],
+        order: { representative: [], staff: [], company: [] },
+        overrides: {}
+      };
+      eachMenuRow(function (tr, category) {
+        var id = tr.dataset.id;
+        payload.order[category].push(id);
+        var fields = readRow(tr);
+        var video = (tr.querySelector(".video-input") || {}).value || "";
+        video = video.trim();
+        if (fields.single != null) fields.single = priceValue(fields.single);
+        else {
+          fields.interview = priceValue(fields.interview);
+          fields.workplace = priceValue(fields.workplace);
+        }
+        if (tr.dataset.extra === "1") {
+          var item = {
+            id: id,
+            category: category,
+            name: fields.name,
+            description: fields.description,
+            duration: fields.duration,
+            video: MenuKit.safeUrl(video)
+          };
+          if (fields.single != null) item.single = fields.single === "対象外" ? "" : fields.single;
+          else {
+            item.interview = fields.interview === "対象外" ? "" : fields.interview;
+            item.workplace = fields.workplace === "対象外" ? "" : fields.workplace;
+          }
+          payload.items.push(item);
+        } else {
+          payload.overrides[id] = fields;
+          if (video || tracked[id]) payload.videos[id] = MenuKit.safeUrl(video);
+        }
+      });
+      return payload;
+    }
+
+    function syncCardOrder(section) {
+      var cards = section.querySelector(".cards");
+      if (!cards) return;
+      section.querySelectorAll("tbody tr[data-id]").forEach(function (tr) {
+        var card = null;
+        cards.querySelectorAll("article[data-id]").forEach(function (node) {
+          if (node.dataset.id === tr.dataset.id) card = node;
+        });
+        if (card) cards.appendChild(card);
+      });
+    }
+
+    function moveRow(tr, direction) {
+      var sibling = direction < 0 ? tr.previousElementSibling : tr.nextElementSibling;
+      while (sibling && !sibling.dataset.id) {
+        sibling = direction < 0 ? sibling.previousElementSibling : sibling.nextElementSibling;
+      }
+      if (!sibling) return;
+      if (direction < 0) tr.parentElement.insertBefore(tr, sibling);
+      else tr.parentElement.insertBefore(sibling, tr);
+      syncCardOrder(tr.closest("section"));
+      markDirty();
+    }
+
+    function beginEdit(element, kind) {
+      if (!element || element.dataset.editing === "1") return;
+      var original = element.textContent.trim();
+      element.dataset.editing = "1";
+      var input = document.createElement("input");
+      input.type = "text";
+      input.className = "inline-edit";
+      input.value = kind === "price" && original === "対象外" ? "" : original;
+      if (kind === "price") input.placeholder = "20万円、応相談など";
+      if (kind === "desc") input.placeholder = "説明";
+      if (kind === "name") input.placeholder = "動画の名前";
+      if (kind === "duration") input.placeholder = "2〜3分";
+      element.textContent = "";
+      element.appendChild(input);
+      input.focus();
+      input.select();
+      var done = false;
+      function finish(save) {
+        if (done) return;
+        done = true;
+        input.removeEventListener("blur", onBlur);
+        var value = save ? input.value.trim() : original;
+        if (save && kind === "name" && !value) {
+          value = original;
+          setStatus("動画の名前を入力してください。", true);
+        }
+        if (save && kind === "price") value = priceValue(value);
+        delete element.dataset.editing;
+        if (kind === "price") element.classList.toggle("na", value === "対象外");
+        element.textContent = value;
+        var tr = element.closest("tr");
+        if (tr && save) syncCard(tr);
+        if (save) markDirty();
+      }
+      function onBlur() { finish(true); }
+      input.addEventListener("blur", onBlur);
+      input.addEventListener("keydown", function (event) {
+        if (event.isComposing || event.keyCode === 229) return;
+        if (event.key === "Enter") {
+          event.preventDefault();
+          finish(true);
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          finish(false);
+        }
+      });
+    }
+
+    function syncCard(tr) {
+      var section = tr.closest("section");
+      if (!section) return;
+      var card = null;
+      section.querySelectorAll("article[data-id]").forEach(function (node) {
+        if (node.dataset.id === tr.dataset.id) card = node;
+      });
+      if (!card) return;
+      var fields = readRow(tr);
+      var payload = { name: fields.name, description: fields.description, duration: fields.duration };
+      if (fields.single != null) payload.single = fields.single;
+      else {
+        payload.interview = fields.interview;
+        payload.workplace = fields.workplace;
+      }
+      var title = card.querySelector("h4");
+      if (title) title.textContent = payload.name;
+      var desc = card.querySelector(".desc");
+      if (desc) desc.textContent = payload.description;
+      var meta = card.querySelector(".meta");
+      if (meta) meta.textContent = "動画の尺：" + payload.duration;
+      var prices = card.querySelector(".card-prices");
+      if (!prices) return;
+      prices.textContent = "";
+      function line(label, value) {
+        var row = document.createElement("p");
+        var span = document.createElement("span");
+        span.textContent = label;
+        var shown = MenuKit.showPrice(value);
+        var strong = document.createElement("strong");
+        if (shown.empty) strong.className = "na";
+        strong.textContent = shown.text;
+        row.append(span, strong);
+        prices.append(row);
+      }
+      if (payload.single != null) line("料金", payload.single);
+      else {
+        line("インタビュー", payload.interview);
+        line("インタビュー＋インサート", payload.workplace);
+      }
+    }
+
+    function bindEdit(element, kind) {
+      if (!element) return;
+      element.classList.add("can-edit");
+      element.title = "ダブルクリックで編集";
+      element.addEventListener("dblclick", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        beginEdit(element, kind);
+      });
+    }
+
+    function enhanceRow(tr) {
+      if (tr.dataset.ready === "1") return;
+      tr.dataset.ready = "1";
+      var th = tr.querySelector("th");
+      var tools = el("div", "row-tools");
+      var grip = el("span", "grip", "移動");
+      grip.draggable = true;
+      grip.title = "ドラッグで並び替え";
+      tools.append(
+        grip,
+        button("text-btn move-up", "上へ", function () { moveRow(tr, -1); }),
+        button("text-btn move-down", "下へ", function () { moveRow(tr, 1); })
+      );
+      if (tr.dataset.extra === "1") {
+        tools.append(button("text-btn do-remove", "この行を消す", function () {
+          var section = tr.closest("section");
+          section.querySelectorAll("article[data-id]").forEach(function (node) {
+            if (node.dataset.id === tr.dataset.id) node.remove();
+          });
+          tr.remove();
+          markDirty();
+        }));
+      }
+      th.insertBefore(tools, th.firstChild);
+      bindEdit(tr.querySelector(".name"), "name");
+      bindEdit(tr.querySelector(".desc"), "desc");
+      bindEdit(tr.querySelector("td.duration"), "duration");
+      Array.prototype.forEach.call(tr.children, function (child) {
+        if (child.classList.contains("price")) bindEdit(child, "price");
+      });
+      var link = th.querySelector("a.sample");
+      var initial = "";
+      if (Object.prototype.hasOwnProperty.call(state.videos, tr.dataset.id)) initial = state.videos[tr.dataset.id] || "";
+      else if (link) initial = link.href;
+      if (initial) tracked[tr.dataset.id] = true;
+      if (link) link.remove();
+      th.append(videoSlot(initial, function (value) {
+        state.videos[tr.dataset.id] = value;
+        if (value) tracked[tr.dataset.id] = true;
+        markDirty();
+      }));
+      grip.addEventListener("dragstart", function (event) {
+        event.dataTransfer.setData("text/plain", tr.dataset.id);
+        event.dataTransfer.effectAllowed = "move";
+      });
+      tr.addEventListener("dragover", function (event) {
+        event.preventDefault();
+        tr.classList.add("drop-target");
+      });
+      tr.addEventListener("dragleave", function () { tr.classList.remove("drop-target"); });
+      tr.addEventListener("drop", function (event) {
+        event.preventDefault();
+        tr.classList.remove("drop-target");
+        var source = null;
+        var id = event.dataTransfer.getData("text/plain");
+        tr.parentElement.querySelectorAll("tr[data-id]").forEach(function (row) {
+          if (row.dataset.id === id) source = row;
+        });
+        if (!source || source === tr) return;
+        var rect = tr.getBoundingClientRect();
+        var after = event.clientY > rect.top + rect.height / 2;
+        tr.parentElement.insertBefore(source, after ? tr.nextElementSibling : tr);
+        syncCardOrder(tr.closest("section"));
+        markDirty();
+      });
+    }
+
+    function ensureAddButtons() {
+      ["representative", "staff", "company"].forEach(function (id) {
+        var tbody = document.querySelector("#" + id + " tbody");
+        if (!tbody || tbody.querySelector("tr.add-row")) return;
+        var row = document.createElement("tr");
+        row.className = "add-row";
+        var cell = document.createElement("td");
+        cell.colSpan = 4;
+        cell.append(button("add-video", "＋ 動画を追加", function () { addBlank(id); }));
+        row.append(cell);
+        tbody.append(row);
+      });
+    }
+
+    function addBlank(category) {
+      var id = "row-" + Date.now();
+      MenuKit.addItem({
+        id: id,
+        category: category,
+        name: "新しい動画",
+        description: "",
+        duration: "2〜3分",
+        interview: "",
+        workplace: ""
+      });
+      var tr = null;
+      document.querySelectorAll("#" + category + " tbody tr[data-id]").forEach(function (row) {
+        if (row.dataset.id === id) tr = row;
+      });
+      if (!tr) return;
+      var add = document.querySelector("#" + category + " tr.add-row");
+      if (add) add.before(tr);
+      enhanceRow(tr);
+      tr.scrollIntoView({ block: "center" });
+      beginEdit(tr.querySelector(".name"), "name");
+      markDirty();
+    }
+
     function start(html, data) {
       var style = (html.match(/<style>([\s\S]*?)<\/style>/) || [])[1] || "";
       var main = (html.match(/<main class="sheet">[\s\S]*?<\/main>/) || [])[0] || "";
@@ -853,11 +1171,9 @@
         tracked[name] = true;
         state.videos[name] = data.videos[name] || "";
       });
-      state.items = (data.items || []).map(function (item) {
-        return Object.assign({}, item);
-      });
-      mountBase();
-      paint();
+      MenuKit.apply(data);
+      eachMenuRow(function (tr) { enhanceRow(tr); });
+      ensureAddButtons();
       savedRaw = rawSnapshot();
       markDirty();
     }
