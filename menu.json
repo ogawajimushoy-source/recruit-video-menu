@@ -12,6 +12,26 @@
       "video": "https://www.youtube.com/watch?v=vQmKygPI9WM",
       "interview": "",
       "workplace": ""
+    },
+    {
+      "id": "row-1794462538667",
+      "category": "company",
+      "name": "会社紹介",
+      "description": "会社の全体像をひと目で",
+      "duration": "2〜3分",
+      "video": "",
+      "interview": "-",
+      "workplace": "45万円"
+    },
+    {
+      "id": "row-1794462519901",
+      "category": "company",
+      "name": "新しい動画",
+      "description": "",
+      "duration": "2〜3分",
+      "video": "",
+      "interview": "",
+      "workplace": ""
     }
   ],
   "order": {
@@ -29,10 +49,12 @@
       "座談会（3〜4名）"
     ],
     "company": [
+      "row-1794462538667",
       "会社紹介",
       "事業内容紹介",
       "福利厚生紹介",
-      "ルームツアー"
+      "ルームツアー",
+      "row-1794462519901"
     ]
   },
   "overrides": {
@@ -93,16 +115,16 @@
       "workplace": "40万円"
     },
     "会社紹介": {
-      "name": "会社紹介",
+      "name": "会社紹介（削除）",
       "description": "会社の全体像をひと目で",
       "duration": "3〜5分",
-      "single": "45万円（インサート込み）"
+      "single": "45万円"
     },
     "事業内容紹介": {
       "name": "事業内容紹介",
       "description": "仕事の中身とビジネスモデル",
       "duration": "3〜5分",
-      "single": "45万円（インサート込み）"
+      "single": "45万円"
     },
     "福利厚生紹介": {
       "name": "福利厚生紹介",
