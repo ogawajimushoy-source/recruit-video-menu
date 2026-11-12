@@ -10,8 +10,8 @@
       "description": "一日の流れを密着",
       "duration": "2〜3分",
       "video": "https://www.youtube.com/watch?v=vQmKygPI9WM",
-      "interview": "",
-      "workplace": ""
+      "interview": "未定",
+      "workplace": "未定"
     },
     {
       "id": "row-1794462538667",
@@ -91,7 +91,7 @@
       "description": "等身大の社員像がテンポよく伝わる",
       "duration": "8〜15分",
       "interview": "35万円",
-      "workplace": "対象外"
+      "workplace": "-"
     },
     "代表×社員 対談": {
       "name": "代表×社員 対談",
@@ -139,5 +139,6 @@
       "duration": "2〜4分",
       "single": "25万円（一律）"
     }
-  }
+  },
+  "removed": []
 }
