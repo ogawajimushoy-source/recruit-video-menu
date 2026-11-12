@@ -315,11 +315,10 @@
   <form id="token-panel" class="token-panel" hidden>
     <p>公開には、GitHubで新しく作るトークンが必要です。ログインパスワードとは別で、<strong>github_pat_</strong> で始まる長い文字列です。作った直後の画面で一度だけ表示され、あとから同じ文字列を見返すことはできません。いま入っている文字列を入れ直しても、拒否されたままです。</p>
     <ol>
-      <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHubで新しいトークンを作る</a>を開く。ログインは ogawajimushoy-source です。</li>
-      <li>Token name に「料金表」など、分かる名前を入れる。</li>
-      <li>Repository access で Only select repositories を選び、recruit-video-menu だけにチェックを入れる。</li>
-      <li>Permissions を開き、Contents を Read and write にする。</li>
-      <li>Generate token を押し、表示された github_pat_ で始まる文字列をコピーする。</li>
+      <li><a href="https://github.com/settings/personal-access-tokens/new?name=%E6%96%99%E9%87%91%E8%A1%A8&amp;contents=write" target="_blank" rel="noopener noreferrer">GitHubで新しいトークンを作る</a>を開く。ログインは ogawajimushoy-source です。名前の「料金表」と、下の「内容」の権限は入った状態で開きます。</li>
+      <li>「リポジトリ アクセス」で「リポジトリの選択のみ」を選び、「選択されたリポジトリ」から recruit-video-menu だけを選ぶ。</li>
+      <li>ページ下の「アクセス許可」を開く。「リポジトリのアクセス許可」にある「内容」の選択を「読み取りと書き込み」にする。英語のままなら Contents の Read and write です。</li>
+      <li>一番下の「トークンの生成」を押す。次の画面に github_pat_ で始まる長い文字列が1回だけ出るので、全部コピーする。この画面を離れると、同じ文字列は二度と表示されません。</li>
       <li>下の欄の中身を全部消して貼り、「このトークンを確認して保存」を押す。使えると出たら「公開する」を押す。</li>
     </ol>
     <label>トークン
