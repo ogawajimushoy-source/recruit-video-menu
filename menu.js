@@ -267,6 +267,12 @@
     data = data || {};
     document.querySelectorAll("[data-extra]").forEach(function (node) { node.remove(); });
     stampBase();
+    (data.removed || []).forEach(function (id) {
+      var row = findTagged("tr[data-id]", id);
+      var card = findTagged("article.card[data-id]", id);
+      if (row) row.remove();
+      if (card) card.remove();
+    });
     var overrides = data.overrides || {};
     Object.keys(overrides).forEach(function (id) { applyFields(id, overrides[id]); });
     (data.items || []).forEach(appendItem);

@@ -305,7 +305,7 @@
     <p id="publish-result" class="bar-result" hidden></p>
   </header>
   <div class="hint">
-    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。</p>
+    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。「この行を消す」で、もともとある項目も消せます。</p>
     <nav>
       <a href="#representative">代表</a>
       <a href="#staff">社員</a>
@@ -329,11 +329,12 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=5"></script>
+  <script src="menu.js?v=6"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
     var state = { videos: {}, items: [] };
+    var removed = {};
     var tracked = {};
     var savedRaw = "";
     var publishing = false;
@@ -1040,7 +1041,8 @@
         videos: {},
         items: [],
         order: { representative: [], staff: [], company: [] },
-        overrides: {}
+        overrides: {},
+        removed: Object.keys(removed)
       };
       eachMenuRow(function (tr, category) {
         var id = tr.dataset.id;
@@ -1215,16 +1217,17 @@
         button("text-btn move-up", "上へ", function () { moveRow(tr, -1); }),
         button("text-btn move-down", "下へ", function () { moveRow(tr, 1); })
       );
-      if (tr.dataset.extra === "1") {
-        tools.append(button("text-btn do-remove", "この行を消す", function () {
-          var section = tr.closest("section");
-          section.querySelectorAll("article[data-id]").forEach(function (node) {
-            if (node.dataset.id === tr.dataset.id) node.remove();
-          });
-          tr.remove();
-          markDirty();
-        }));
-      }
+      tools.append(button("text-btn do-remove", "この行を消す", function () {
+        var section = tr.closest("section");
+        if (tr.dataset.extra !== "1") removed[tr.dataset.id] = true;
+        delete state.videos[tr.dataset.id];
+        delete tracked[tr.dataset.id];
+        section.querySelectorAll("article[data-id]").forEach(function (node) {
+          if (node.dataset.id === tr.dataset.id) node.remove();
+        });
+        tr.remove();
+        markDirty();
+      }));
       th.insertBefore(tools, th.firstChild);
       bindEdit(tr.querySelector(".name"), "name");
       bindEdit(tr.querySelector(".desc"), "desc");
@@ -1319,6 +1322,8 @@
       previewStyle.textContent = style;
       document.head.append(previewStyle, document.getElementById("overrides"));
       stage.innerHTML = main;
+      removed = {};
+      (data.removed || []).forEach(function (id) { removed[id] = true; });
       Object.keys(data.videos || {}).forEach(function (name) {
         tracked[name] = true;
         state.videos[name] = data.videos[name] || "";

@@ -206,7 +206,9 @@
       letter-spacing: 0.08em;
     }
     .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    col.duration { width: 7.5rem; }
+    col.price { width: 9.25rem; }
     thead th {
       padding: 10px 12px;
       color: var(--green-deep);
@@ -216,17 +218,16 @@
       vertical-align: bottom;
     }
     thead th.num {
-      background: #efeae1;
+      padding: 10px 0 10px 8px;
       color: var(--ink);
       text-align: right;
       white-space: nowrap;
     }
-    thead th.num span {
-      display: block;
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.08em;
+    thead th.num .col-label {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #efeae1;
+      line-height: 1.4;
     }
     tbody th, tbody td {
       padding: 20px 12px;
@@ -479,12 +480,18 @@
       <h3>01　代表</h3>
       <div class="table-wrap">
         <table>
+          <colgroup>
+            <col>
+            <col class="duration">
+            <col class="price">
+            <col class="price">
+          </colgroup>
           <thead>
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インサートなし<span>税別</span></th>
-              <th class="num" scope="col">インサートあり<span>税別</span></th>
+              <th class="num" scope="col"><span class="col-label">インサートなし</span></th>
+              <th class="num" scope="col"><span class="col-label">インサートあり</span></th>
             </tr>
           </thead>
           <tbody>
@@ -556,12 +563,18 @@
       <h3>02　社員</h3>
       <div class="table-wrap">
         <table>
+          <colgroup>
+            <col>
+            <col class="duration">
+            <col class="price">
+            <col class="price">
+          </colgroup>
           <thead>
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インサートなし<span>税別</span></th>
-              <th class="num" scope="col">インサートあり<span>税別</span></th>
+              <th class="num" scope="col"><span class="col-label">インサートなし</span></th>
+              <th class="num" scope="col"><span class="col-label">インサートあり</span></th>
             </tr>
           </thead>
           <tbody>
@@ -673,12 +686,18 @@
       <h3>03　会社</h3>
       <div class="table-wrap">
         <table>
+          <colgroup>
+            <col>
+            <col class="duration">
+            <col class="price">
+            <col class="price">
+          </colgroup>
           <thead>
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インサートなし<span>税別</span></th>
-              <th class="num" scope="col">インサートあり<span>税別</span></th>
+              <th class="num" scope="col"><span class="col-label">インサートなし</span></th>
+              <th class="num" scope="col"><span class="col-label">インサートあり</span></th>
             </tr>
           </thead>
           <tbody>
