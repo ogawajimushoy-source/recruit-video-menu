@@ -5,7 +5,7 @@
     company: "会社"
   };
 
-  var PRICE_LABELS = ["インタビュー", "インタビュー＋インサート"];
+  var PRICE_LABELS = ["インサートなし", "インサートあり"];
 
   var BASE = [
     { category: "representative", name: "代表者メッセージ" },

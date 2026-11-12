@@ -211,6 +211,15 @@
       font-size: 15px;
     }
     #stage .add-video:hover, #stage .add-video:focus { background: #f7fbf8; }
+    #stage tr[data-extra] .desc:empty {
+      display: block;
+      min-height: 1.5em;
+    }
+    #stage tr[data-extra] .desc:empty::before {
+      content: "説明";
+      color: #b7b1a6;
+      font-weight: 400;
+    }
     #stage .can-edit { cursor: text; border-radius: 4px; }
     #stage .can-edit:hover { box-shadow: inset 0 -1px 0 var(--green); }
     #stage .inline-edit {
@@ -260,8 +269,8 @@
         letter-spacing: 0.06em;
       }
       body.editing #stage td.duration::before { content: "尺の目安"; }
-      body.editing #stage td.price:nth-child(3)::before { content: "インタビュー"; }
-      body.editing #stage td.price:nth-child(4)::before { content: "インタビュー＋インサート"; }
+      body.editing #stage td.price:nth-child(3)::before { content: "インサートなし"; }
+      body.editing #stage td.price:nth-child(4)::before { content: "インサートあり"; }
       body.editing #stage td.price[colspan="2"]::before { content: "料金"; }
       body.editing #stage .price-input,
       body.editing #stage td.price .inline-edit { text-align: left; }
@@ -503,8 +512,8 @@
         return;
       }
       [
-        [item.interview || "", "インタビュー"],
-        [item.workplace || "", "インタビュー＋インサート"]
+        [item.interview || "", "インサートなし"],
+        [item.workplace || "", "インサートあり"]
       ].forEach(function (pair) {
         var cell = el("td", "price");
         var price = textInput("price-input", pair[0], "対象外", pair[1]);
@@ -1034,8 +1043,8 @@
       }
       if (payload.single != null) line("料金", payload.single);
       else {
-        line("インタビュー", payload.interview);
-        line("インタビュー＋インサート", payload.workplace);
+        line("インサートなし", payload.interview);
+        line("インサートあり", payload.workplace);
       }
     }
 

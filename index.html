@@ -180,12 +180,13 @@
     .inserts article {
       margin: 0;
       padding: 20px 20px 18px;
-      background: var(--pill);
+      background: var(--card);
+      border: 1px solid #e4ddd2;
       border-radius: 8px;
     }
     .inserts h3 {
       margin: 0;
-      color: var(--green);
+      color: var(--ink);
       font-size: 16px;
       font-weight: 700;
     }
@@ -215,7 +216,8 @@
       vertical-align: bottom;
     }
     thead th.num {
-      background: var(--pill);
+      background: #efeae1;
+      color: var(--ink);
       text-align: right;
       white-space: nowrap;
     }
@@ -245,6 +247,7 @@
       font-size: 14px;
       font-weight: 400;
     }
+    .desc:empty { display: none; }
     .sample {
       display: inline-block;
       margin-top: 8px;
@@ -463,11 +466,11 @@
     <h2>単品メニュー</h2>
     <div class="inserts">
       <article>
-        <h3>インタビュー</h3>
+        <h3>インサートなし</h3>
         <p>人物へのインタビューを中心に構成した動画です。</p>
       </article>
       <article>
-        <h3>インタビュー＋インサート</h3>
+        <h3>インサートあり</h3>
         <p>インタビューに加え、オフィスや仕事中の様子を撮影し、映像に組み込みます。</p>
       </article>
     </div>
@@ -480,8 +483,8 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インタビュー<span>税別</span></th>
-              <th class="num" scope="col">インタビュー＋インサート<span>税別</span></th>
+              <th class="num" scope="col">インサートなし<span>税別</span></th>
+              <th class="num" scope="col">インサートあり<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
@@ -521,8 +524,8 @@
           <p class="desc">求職者への直接の呼びかけ</p>
           <p class="meta">動画の尺：2〜3分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>20万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>30万円</strong></p>
+            <p><span>インサートなし</span><strong>20万円</strong></p>
+            <p><span>インサートあり</span><strong>30万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -531,8 +534,8 @@
           <p class="desc">これからの事業と成長の道筋</p>
           <p class="meta">動画の尺：3〜5分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>25万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>35万円</strong></p>
+            <p><span>インサートなし</span><strong>25万円</strong></p>
+            <p><span>インサートあり</span><strong>35万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -541,8 +544,8 @@
           <p class="desc">人柄がテンポよく伝わる</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>35万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong class="na">対象外</strong></p>
+            <p><span>インサートなし</span><strong>35万円</strong></p>
+            <p><span>インサートあり</span><strong class="na">対象外</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -557,8 +560,8 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インタビュー<span>税別</span></th>
-              <th class="num" scope="col">インタビュー＋インサート<span>税別</span></th>
+              <th class="num" scope="col">インサートなし<span>税別</span></th>
+              <th class="num" scope="col">インサートあり<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
@@ -618,8 +621,8 @@
           <p class="meta">動画の尺：2〜3分</p>
           <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>20万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>30万円</strong></p>
+            <p><span>インサートなし</span><strong>20万円</strong></p>
+            <p><span>インサートあり</span><strong>30万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -628,8 +631,8 @@
           <p class="desc">等身大の社員像がテンポよく伝わる</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>35万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong class="na">対象外</strong></p>
+            <p><span>インサートなし</span><strong>35万円</strong></p>
+            <p><span>インサートあり</span><strong class="na">対象外</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -638,8 +641,8 @@
           <p class="desc">代表と現場の距離感</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>30万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>40万円</strong></p>
+            <p><span>インサートなし</span><strong>30万円</strong></p>
+            <p><span>インサートあり</span><strong>40万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -648,8 +651,8 @@
           <p class="desc">同期・先輩後輩・部署を越えた関係性</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>30万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>40万円</strong></p>
+            <p><span>インサートなし</span><strong>30万円</strong></p>
+            <p><span>インサートあり</span><strong>40万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -658,8 +661,8 @@
           <p class="desc">社内の空気感と人のつながり</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>30万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>40万円</strong></p>
+            <p><span>インサートなし</span><strong>30万円</strong></p>
+            <p><span>インサートあり</span><strong>40万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -674,8 +677,8 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">インタビュー<span>税別</span></th>
-              <th class="num" scope="col">インタビュー＋インサート<span>税別</span></th>
+              <th class="num" scope="col">インサートなし<span>税別</span></th>
+              <th class="num" scope="col">インサートあり<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
@@ -739,8 +742,8 @@
           <p class="desc">制度を、使っている社員の声とともに</p>
           <p class="meta">動画の尺：3〜5分</p>
           <div class="card-prices">
-            <p><span>インタビュー</span><strong>25万円</strong></p>
-            <p><span>インタビュー＋インサート</span><strong>35万円</strong></p>
+            <p><span>インサートなし</span><strong>25万円</strong></p>
+            <p><span>インサートあり</span><strong>35万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -803,7 +806,7 @@
     <hr class="rule">
 
     <h2>追加料金・注意事項</h2>
-    <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インタビューか、インタビュー＋インサートかの範囲です。次のものは別途です。</p>
+    <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インサートなしか、インサートありかの範囲です。次のものは別途です。</p>
     <ul class="notes">
       <li>この範囲を超える撮影</li>
       <li>遠方の交通・宿泊</li>
