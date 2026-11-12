@@ -2,5 +2,142 @@
   "videos": {
     "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM"
   },
-  "items": []
+  "items": [
+    {
+      "id": "row-1794462275393",
+      "category": "staff",
+      "name": "社員の一日",
+      "description": "一日の流れを密着",
+      "duration": "2〜3分",
+      "video": "https://www.youtube.com/watch?v=vQmKygPI9WM",
+      "interview": "",
+      "workplace": ""
+    },
+    {
+      "id": "row-1794462538667",
+      "category": "company",
+      "name": "会社紹介",
+      "description": "会社の全体像をひと目で",
+      "duration": "2〜3分",
+      "video": "",
+      "interview": "-",
+      "workplace": "45万円"
+    },
+    {
+      "id": "row-1794462519901",
+      "category": "company",
+      "name": "新しい動画",
+      "description": "",
+      "duration": "2〜3分",
+      "video": "",
+      "interview": "",
+      "workplace": ""
+    }
+  ],
+  "order": {
+    "representative": [
+      "代表者メッセージ",
+      "事業計画",
+      "代表が答える100の質問"
+    ],
+    "staff": [
+      "社員紹介（1名）",
+      "row-1794462275393",
+      "社員が答える100の質問",
+      "代表×社員 対談",
+      "社員×社員 対談",
+      "座談会（3〜4名）"
+    ],
+    "company": [
+      "row-1794462538667",
+      "会社紹介",
+      "事業内容紹介",
+      "福利厚生紹介",
+      "ルームツアー",
+      "row-1794462519901"
+    ]
+  },
+  "overrides": {
+    "代表者メッセージ": {
+      "name": "代表者メッセージ",
+      "description": "求職者への直接の呼びかけ",
+      "duration": "2〜3分",
+      "interview": "20万円",
+      "workplace": "30万円"
+    },
+    "事業計画": {
+      "name": "事業計画",
+      "description": "これからの事業と成長の道筋",
+      "duration": "3〜5分",
+      "interview": "25万円",
+      "workplace": "35万円"
+    },
+    "代表が答える100の質問": {
+      "name": "代表が答える100の質問",
+      "description": "人柄がテンポよく伝わる",
+      "duration": "8〜15分",
+      "interview": "35万円",
+      "workplace": "対象外"
+    },
+    "社員紹介（1名）": {
+      "name": "社員紹介（1名）",
+      "description": "一人のリアルなキャリアと人柄",
+      "duration": "2〜3分",
+      "interview": "20万円",
+      "workplace": "30万円"
+    },
+    "社員が答える100の質問": {
+      "name": "社員が答える100の質問",
+      "description": "等身大の社員像がテンポよく伝わる",
+      "duration": "8〜15分",
+      "interview": "35万円",
+      "workplace": "対象外"
+    },
+    "代表×社員 対談": {
+      "name": "代表×社員 対談",
+      "description": "代表と現場の距離感",
+      "duration": "8〜15分",
+      "interview": "30万円",
+      "workplace": "40万円"
+    },
+    "社員×社員 対談": {
+      "name": "社員×社員 対談",
+      "description": "同期・先輩後輩・部署を越えた関係性",
+      "duration": "8〜15分",
+      "interview": "30万円",
+      "workplace": "40万円"
+    },
+    "座談会（3〜4名）": {
+      "name": "座談会（3〜4名）",
+      "description": "社内の空気感と人のつながり",
+      "duration": "8〜15分",
+      "interview": "30万円",
+      "workplace": "40万円"
+    },
+    "会社紹介": {
+      "name": "会社紹介（削除）",
+      "description": "会社の全体像をひと目で",
+      "duration": "3〜5分",
+      "single": "45万円"
+    },
+    "事業内容紹介": {
+      "name": "事業内容紹介",
+      "description": "仕事の中身とビジネスモデル",
+      "duration": "3〜5分",
+      "single": "45万円"
+    },
+    "福利厚生紹介": {
+      "name": "福利厚生紹介",
+      "description": "制度を、使っている社員の声とともに",
+      "duration": "3〜5分",
+      "interview": "25万円",
+      "workplace": "35万円"
+    },
+    "ルームツアー": {
+      "name": "ルームツアー",
+      "description": "働く環境とオフィスの雰囲気",
+      "duration": "2〜4分",
+      "single": "25万円（一律）"
+    }
+  }
 }
