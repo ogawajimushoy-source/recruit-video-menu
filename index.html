@@ -21,14 +21,19 @@
       --pill-ink: #2a5344;
     }
     * { box-sizing: border-box; }
-    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
     body {
       margin: 0;
       background: var(--paper);
       color: var(--ink);
       font-family: "Zen Kaku Gothic New", "Yu Gothic", "Yu Gothic UI", "Meiryo", sans-serif;
+      font-weight: 400;
       line-height: 1.7;
     }
+    a { color: var(--green); }
     .sheet {
       width: min(920px, 100%);
       margin: 0 auto;
@@ -70,81 +75,49 @@
       color: #3a3834;
       font-size: 15px;
     }
-    .filters {
+    .aims {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin: 32px 0 0;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 36px 0 0;
+      padding: 0;
+      list-style: none;
     }
-    .filter-all {
-      grid-column: 1 / -1;
-      justify-self: start;
-      margin: 0;
-      padding: 0 0 2px;
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      font: inherit;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .filter-all[aria-pressed="true"] {
-      color: var(--green);
-      font-weight: 700;
-      box-shadow: inset 0 -1px 0 var(--green);
-    }
-    .filter {
-      margin: 0;
-      padding: 18px 16px 16px;
+    .aims a {
+      display: block;
+      height: 100%;
+      padding: 18px 18px 16px;
+      background: var(--card);
       border: 1px solid #ebe4d8;
       border-radius: 8px;
-      background: var(--card);
       color: inherit;
-      font: inherit;
-      text-align: left;
-      cursor: pointer;
+      text-decoration: none;
     }
-    .filter span {
+    .aims a:hover { border-color: var(--green); }
+    .aims span {
       display: block;
       color: var(--green);
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 0.08em;
     }
-    .filter strong {
+    .aims strong {
       display: block;
       margin-top: 8px;
       font-family: "Shippori Mincho", "Yu Mincho", serif;
       font-size: 22px;
       font-weight: 600;
-      letter-spacing: 0.03em;
-      line-height: 1.4;
-    }
-    .filter[aria-pressed="true"] {
-      border-color: var(--green);
-      background: var(--green);
-      color: #f7f4ee;
-    }
-    .filter[aria-pressed="true"] span { color: #d5e6dc; }
-    .filter:focus-visible,
-    .filter-all:focus-visible,
-    .sample:focus-visible {
-      outline: 2px solid var(--green);
-      outline-offset: 3px;
-    }
-    .sr {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+      letter-spacing: 0.04em;
     }
     .rule { margin: 48px 0 36px; border: 0; border-top: 1px solid #cfc8bc; }
-    .plan h2, .block h2 {
+    .section-label {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+    }
+    h2 {
       margin: 0;
       font-family: "Shippori Mincho", "Yu Mincho", serif;
       font-size: 32px;
@@ -152,13 +125,76 @@
       letter-spacing: 0.05em;
       line-height: 1.4;
     }
-    .plan-lead, .section-lead {
-      margin: 10px 0 0;
+    .section-lead {
+      margin: 12px 0 0;
       color: #3a3834;
       font-size: 15px;
     }
-    .plan + .plan { margin-top: 42px; }
-    .table-wrap { margin-top: 22px; }
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 28px 0 0;
+    }
+    .choices a {
+      display: block;
+      height: 100%;
+      margin: 0;
+      padding: 22px 20px 20px;
+      background: var(--card);
+      border: 1px solid #ebe4d8;
+      border-radius: 8px;
+      color: inherit;
+      text-decoration: none;
+    }
+    .choices a:hover { border-color: var(--green); }
+    .choices h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.6;
+    }
+    .choices p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .inserts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 28px 0 8px;
+    }
+    .inserts article {
+      margin: 0;
+      padding: 20px 20px 18px;
+      background: var(--pill);
+      border-radius: 8px;
+    }
+    .inserts h3 {
+      margin: 0;
+      color: var(--green);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .inserts p {
+      margin: 8px 0 0;
+      color: #3a3834;
+      font-size: 14px;
+    }
+    .menu-block { margin-top: 34px; }
+    .menu-block h3 {
+      margin: 0 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      color: var(--green);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+    .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     thead th {
       padding: 10px 12px;
@@ -171,6 +207,7 @@
     thead th.num {
       background: var(--pill);
       text-align: right;
+      white-space: nowrap;
     }
     thead th.num span {
       display: block;
@@ -180,7 +217,7 @@
       letter-spacing: 0.08em;
     }
     tbody th, tbody td {
-      padding: 18px 12px;
+      padding: 20px 12px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: middle;
@@ -198,56 +235,82 @@
       font-size: 14px;
       font-weight: 400;
     }
-    .cat {
-      color: var(--pill-ink);
-      font-size: 13px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
     .sample {
       display: inline-block;
       margin-top: 8px;
-      color: var(--green);
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.06em;
       text-underline-offset: 3px;
     }
-    .duration { color: #3f3d39; font-size: 15px; white-space: nowrap; }
+    .duration {
+      color: #3f3d39;
+      font-size: 15px;
+      white-space: nowrap;
+    }
     .price {
+      font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
       font-size: 24px;
       font-weight: 700;
+      letter-spacing: 0.01em;
       text-align: right;
       white-space: nowrap;
     }
-    .unit { margin-left: 4px; font-size: 13px; font-weight: 500; }
-    .na { color: var(--muted); font-size: 14px; font-weight: 500; }
+    .unit {
+      margin-left: 4px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .na {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
     .cards { display: none; }
     .card {
-      margin: 0 0 14px;
+      margin: 0 0 12px;
       padding: 20px 18px 16px;
       background: var(--card);
       border: 1px solid #ebe4d8;
       border-radius: 8px;
     }
-    .card h3 { margin: 0; font-size: 17px; font-weight: 700; }
-    .card .cat { display: inline-block; margin-bottom: 8px; }
-    .card .desc { margin-top: 6px; }
-    .card .meta { margin: 12px 0 0; color: #3f3d39; font-size: 14px; }
-    .card .amount {
-      margin: 14px 0 0;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
-      font-size: 28px;
+    .card h4 {
+      margin: 0;
+      font-size: 17px;
       font-weight: 700;
-      line-height: 1.2;
     }
-    .card .amount .unit { font-size: 14px; }
+    .card .desc { margin-top: 6px; }
+    .card .meta {
+      margin: 12px 0 0;
+      color: #3f3d39;
+      font-size: 14px;
+    }
+    .card-prices { margin-top: 14px; }
+    .card-prices p {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+    .card-prices span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .card-prices strong {
+      font-size: 24px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .card-prices .na { font-size: 14px; }
     .card .tax-note {
-      margin: 6px 0 0;
+      margin: 8px 0 0;
       color: var(--muted);
       font-size: 12px;
       letter-spacing: 0.08em;
+      text-align: right;
     }
     .series {
       display: grid;
@@ -262,7 +325,12 @@
       border: 1px solid #ebe4d8;
       border-radius: 8px;
     }
-    .series h3 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.04em; }
+    .series h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
     .series p { margin: 8px 0 16px; color: var(--muted); font-size: 14px; }
     .themes {
       display: flex;
@@ -300,12 +368,18 @@
       font-size: 12px;
       letter-spacing: 0.06em;
     }
-    .series-prices span { display: block; font-size: 13px; }
+    .series-prices span {
+      display: block;
+      font-size: 13px;
+      opacity: 0.92;
+    }
     .series-prices strong {
       display: block;
       margin-top: 4px;
+      font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
       font-size: 40px;
       font-weight: 700;
+      letter-spacing: 0.02em;
       line-height: 1.2;
     }
     .series-prices em {
@@ -314,27 +388,32 @@
       font-style: normal;
       font-size: 13px;
       letter-spacing: 0.06em;
+      opacity: 0.9;
     }
-    .notes { margin: 18px 0 0; padding: 0 0 0 1.2em; }
+    .notes { margin: 22px 0 0; padding: 0; }
     .notes li { margin: 0 0 6px; }
-    .foot { margin-top: 28px; color: var(--muted); font-size: 13px; }
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
     .foot p { margin: 0; }
-    @media (max-width: 799px) {
-      .sheet { padding: 36px 20px 72px; }
-      h1 { font-size: 34px; }
+    @media (max-width: 800px) {
+      .sheet { padding: 40px 22px 72px; }
+      h1 { font-size: 36px; }
       .promise { font-size: 24px; }
-      .plan h2, .block h2 { font-size: 28px; }
-      .table-wrap { display: none; }
-      .cards { display: block; margin-top: 18px; }
-      .series, .series-prices { grid-template-columns: 1fr; }
+      h2 { font-size: 28px; }
     }
     @media (max-width: 599px) {
+      .aims, .choices, .inserts, .series, .series-prices { grid-template-columns: 1fr; }
+      .table-wrap { display: none; }
+      .cards { display: block; }
       h1 { font-size: 32px; }
+      h2 { font-size: 26px; }
       .promise { font-size: 22px; }
-      .filters { grid-template-columns: 1fr; }
-      .filter { padding: 16px 16px 14px; }
-      .filter strong { font-size: 20px; }
-      .card .amount { font-size: 26px; }
     }
   </style>
 </head>
@@ -345,424 +424,324 @@
     <h1>採用動画 料金プラン</h1>
     <p class="promise">会社の魅力を、伝わる映像に。</p>
     <p class="lead">企業の想いや働く人の姿、仕事の魅力を伝える採用動画をご提案します。</p>
-
-    <div class="filters" role="group" aria-label="カテゴリーで絞り込む">
-      <button class="filter-all" type="button" data-filter="all" aria-pressed="true">すべて表示</button>
-      <button class="filter" type="button" data-filter="representative" aria-pressed="false">
-        <span>代表</span>
-        <strong>経営者の想い</strong>
-      </button>
-      <button class="filter" type="button" data-filter="staff" aria-pressed="false">
-        <span>社員</span>
-        <strong>人柄・職場の雰囲気</strong>
-      </button>
-      <button class="filter" type="button" data-filter="company" aria-pressed="false">
-        <span>会社</span>
-        <strong>事業・仕事内容</strong>
-      </button>
-    </div>
-    <p id="filter-status" class="sr" aria-live="polite">すべてのメニューを表示しています</p>
+    <ul class="aims">
+      <li><a href="#representative"><span>代表・経営者</span><strong>想いを伝える</strong></a></li>
+      <li><a href="#staff"><span>社員・職場</span><strong>人柄を伝える</strong></a></li>
+      <li><a href="#company"><span>会社・仕事</span><strong>事業を伝える</strong></a></li>
+    </ul>
 
     <hr class="rule">
 
-    <section class="plan" data-plan="interview">
-      <h2>インタビューのみ</h2>
-      <p class="plan-lead">人物へのインタビューを中心に構成した動画です。</p>
+    <h2>どんなことを伝えたいですか？</h2>
+    <p class="section-lead">伝えたいことから、動画の種類を選べます。</p>
+    <div class="choices">
+      <a href="#representative">
+        <h3>経営者の想いや会社の方向性を伝えたい</h3>
+        <p>代表者メッセージ、事業計画、代表が語るシリーズ</p>
+      </a>
+      <a href="#staff">
+        <h3>一緒に働く社員の人柄を伝えたい</h3>
+        <p>社員紹介、社員同士の対談、座談会</p>
+      </a>
+      <a href="#company">
+        <h3>会社の雰囲気や仕事内容を伝えたい</h3>
+        <p>会社紹介、事業内容紹介、福利厚生紹介、ルームツアー</p>
+      </a>
+    </div>
+
+    <hr class="rule">
+
+    <h2>単品メニュー</h2>
+    <div class="inserts">
+      <article>
+        <h3>インタビューのみ</h3>
+        <p>人物へのインタビューを中心に構成した動画です。</p>
+      </article>
+      <article>
+        <h3>インタビュー＋仕事風景の撮影</h3>
+        <p>インタビューに加え、オフィスや仕事中の様子を撮影し、映像に組み込みます。</p>
+      </article>
+    </div>
+
+    <section class="menu-block" id="representative">
+      <h3>01　代表</h3>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th scope="col">動画の種類</th>
-              <th scope="col">カテゴリー</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">料金<span>税別</span></th>
+              <th class="num" scope="col">インタビューのみ<span>税別</span></th>
+              <th class="num" scope="col">仕事風景の撮影込み<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
-            <tr data-cat="representative">
+            <tr>
               <th scope="row">
                 <span class="name">代表者メッセージ</span>
                 <span class="desc">求職者への直接の呼びかけ</span>
               </th>
-              <td class="cat">代表</td>
               <td class="duration">2〜3分</td>
               <td class="price">20万円</td>
+              <td class="price">30万円</td>
             </tr>
-            <tr data-cat="representative">
+            <tr>
               <th scope="row">
                 <span class="name">事業計画</span>
                 <span class="desc">これからの事業と成長の道筋</span>
               </th>
-              <td class="cat">代表</td>
               <td class="duration">3〜5分</td>
               <td class="price">25万円</td>
+              <td class="price">35万円</td>
             </tr>
-            <tr data-cat="representative">
+            <tr>
               <th scope="row">
                 <span class="name">代表が答える100の質問</span>
                 <span class="desc">人柄がテンポよく伝わる</span>
               </th>
-              <td class="cat">代表</td>
               <td class="duration">8〜15分</td>
               <td class="price">35万円</td>
-            </tr>
-            <tr data-cat="staff">
-              <th scope="row">
-                <span class="name">社員紹介（1名）</span>
-                <span class="desc">一人のリアルなキャリアと人柄</span>
-                <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
-              </th>
-              <td class="cat">社員</td>
-              <td class="duration">2〜3分</td>
-              <td class="price">20万円</td>
-            </tr>
-            <tr data-cat="staff">
-              <th scope="row">
-                <span class="name">社員が答える100の質問</span>
-                <span class="desc">等身大の社員像がテンポよく伝わる</span>
-              </th>
-              <td class="cat">社員</td>
-              <td class="duration">8〜15分</td>
-              <td class="price">35万円</td>
-            </tr>
-            <tr data-cat="staff">
-              <th scope="row">
-                <span class="name">代表×社員 対談</span>
-                <span class="desc">代表と現場の距離感</span>
-              </th>
-              <td class="cat">社員</td>
-              <td class="duration">8〜15分</td>
-              <td class="price">30万円</td>
-            </tr>
-            <tr data-cat="staff">
-              <th scope="row">
-                <span class="name">社員×社員 対談</span>
-                <span class="desc">同期・先輩後輩・部署を越えた関係性</span>
-              </th>
-              <td class="cat">社員</td>
-              <td class="duration">8〜15分</td>
-              <td class="price">30万円</td>
-            </tr>
-            <tr data-cat="staff">
-              <th scope="row">
-                <span class="name">座談会（3〜4名）</span>
-                <span class="desc">社内の空気感と人のつながり</span>
-              </th>
-              <td class="cat">社員</td>
-              <td class="duration">8〜15分</td>
-              <td class="price">30万円</td>
-            </tr>
-            <tr data-cat="company">
-              <th scope="row">
-                <span class="name">福利厚生紹介</span>
-                <span class="desc">制度を、使っている社員の声とともに</span>
-              </th>
-              <td class="cat">会社</td>
-              <td class="duration">3〜5分</td>
-              <td class="price">25万円</td>
+              <td class="price na">対象外</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="cards">
-        <article class="card" data-cat="representative">
-          <p class="cat">代表</p>
-          <h3>代表者メッセージ</h3>
+        <article class="card">
+          <h4>代表者メッセージ</h4>
           <p class="desc">求職者への直接の呼びかけ</p>
           <p class="meta">動画の尺：2〜3分</p>
-          <p class="amount">20万円</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>20万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>30万円</strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card" data-cat="representative">
-          <p class="cat">代表</p>
-          <h3>事業計画</h3>
+        <article class="card">
+          <h4>事業計画</h4>
           <p class="desc">これからの事業と成長の道筋</p>
           <p class="meta">動画の尺：3〜5分</p>
-          <p class="amount">25万円</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>25万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>35万円</strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card" data-cat="representative">
-          <p class="cat">代表</p>
-          <h3>代表が答える100の質問</h3>
+        <article class="card">
+          <h4>代表が答える100の質問</h4>
           <p class="desc">人柄がテンポよく伝わる</p>
           <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">35万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>社員紹介（1名）</h3>
-          <p class="desc">一人のリアルなキャリアと人柄</p>
-          <p class="meta">動画の尺：2〜3分</p>
-          <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
-          <p class="amount">20万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>社員が答える100の質問</h3>
-          <p class="desc">等身大の社員像がテンポよく伝わる</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">35万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>代表×社員 対談</h3>
-          <p class="desc">代表と現場の距離感</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">30万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>社員×社員 対談</h3>
-          <p class="desc">同期・先輩後輩・部署を越えた関係性</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">30万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>座談会（3〜4名）</h3>
-          <p class="desc">社内の空気感と人のつながり</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">30万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="company">
-          <p class="cat">会社</p>
-          <h3>福利厚生紹介</h3>
-          <p class="desc">制度を、使っている社員の声とともに</p>
-          <p class="meta">動画の尺：3〜5分</p>
-          <p class="amount">25万円</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>35万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong class="na">対象外</strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
       </div>
     </section>
 
-    <section class="plan" data-plan="workplace">
-      <h2>仕事風景の撮影込み</h2>
-      <p class="plan-lead">インタビューに加え、オフィスや仕事中の様子を撮影し、映像に組み込みます。</p>
+    <section class="menu-block" id="staff">
+      <h3>02　社員</h3>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th scope="col">動画の種類</th>
-              <th scope="col">カテゴリー</th>
               <th scope="col">尺の目安</th>
-              <th class="num" scope="col">料金<span>税別</span></th>
+              <th class="num" scope="col">インタビューのみ<span>税別</span></th>
+              <th class="num" scope="col">仕事風景の撮影込み<span>税別</span></th>
             </tr>
           </thead>
           <tbody>
-            <tr data-cat="representative">
-              <th scope="row">
-                <span class="name">代表者メッセージ</span>
-                <span class="desc">求職者への直接の呼びかけ</span>
-              </th>
-              <td class="cat">代表</td>
-              <td class="duration">2〜3分</td>
-              <td class="price">30万円</td>
-            </tr>
-            <tr data-cat="representative">
-              <th scope="row">
-                <span class="name">事業計画</span>
-                <span class="desc">これからの事業と成長の道筋</span>
-              </th>
-              <td class="cat">代表</td>
-              <td class="duration">3〜5分</td>
-              <td class="price">35万円</td>
-            </tr>
-            <tr data-cat="representative">
-              <th scope="row">
-                <span class="name">代表が答える100の質問</span>
-                <span class="desc">人柄がテンポよく伝わる</span>
-              </th>
-              <td class="cat">代表</td>
-              <td class="duration">8〜15分</td>
-              <td class="price na">対象外</td>
-            </tr>
-            <tr data-cat="staff">
+            <tr>
               <th scope="row">
                 <span class="name">社員紹介（1名）</span>
                 <span class="desc">一人のリアルなキャリアと人柄</span>
                 <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
               </th>
-              <td class="cat">社員</td>
               <td class="duration">2〜3分</td>
+              <td class="price">20万円</td>
               <td class="price">30万円</td>
             </tr>
-            <tr data-cat="staff">
+            <tr>
               <th scope="row">
                 <span class="name">社員が答える100の質問</span>
                 <span class="desc">等身大の社員像がテンポよく伝わる</span>
               </th>
-              <td class="cat">社員</td>
               <td class="duration">8〜15分</td>
+              <td class="price">35万円</td>
               <td class="price na">対象外</td>
             </tr>
-            <tr data-cat="staff">
+            <tr>
               <th scope="row">
                 <span class="name">代表×社員 対談</span>
                 <span class="desc">代表と現場の距離感</span>
               </th>
-              <td class="cat">社員</td>
               <td class="duration">8〜15分</td>
+              <td class="price">30万円</td>
               <td class="price">40万円</td>
             </tr>
-            <tr data-cat="staff">
+            <tr>
               <th scope="row">
                 <span class="name">社員×社員 対談</span>
                 <span class="desc">同期・先輩後輩・部署を越えた関係性</span>
               </th>
-              <td class="cat">社員</td>
               <td class="duration">8〜15分</td>
+              <td class="price">30万円</td>
               <td class="price">40万円</td>
             </tr>
-            <tr data-cat="staff">
+            <tr>
               <th scope="row">
                 <span class="name">座談会（3〜4名）</span>
                 <span class="desc">社内の空気感と人のつながり</span>
               </th>
-              <td class="cat">社員</td>
               <td class="duration">8〜15分</td>
+              <td class="price">30万円</td>
               <td class="price">40万円</td>
             </tr>
-            <tr data-cat="company">
+          </tbody>
+        </table>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <h4>社員紹介（1名）</h4>
+          <p class="desc">一人のリアルなキャリアと人柄</p>
+          <p class="meta">動画の尺：2〜3分</p>
+          <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>20万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>30万円</strong></p>
+          </div>
+          <p class="tax-note">税別</p>
+        </article>
+        <article class="card">
+          <h4>社員が答える100の質問</h4>
+          <p class="desc">等身大の社員像がテンポよく伝わる</p>
+          <p class="meta">動画の尺：8〜15分</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>35万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong class="na">対象外</strong></p>
+          </div>
+          <p class="tax-note">税別</p>
+        </article>
+        <article class="card">
+          <h4>代表×社員 対談</h4>
+          <p class="desc">代表と現場の距離感</p>
+          <p class="meta">動画の尺：8〜15分</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>30万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>40万円</strong></p>
+          </div>
+          <p class="tax-note">税別</p>
+        </article>
+        <article class="card">
+          <h4>社員×社員 対談</h4>
+          <p class="desc">同期・先輩後輩・部署を越えた関係性</p>
+          <p class="meta">動画の尺：8〜15分</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>30万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>40万円</strong></p>
+          </div>
+          <p class="tax-note">税別</p>
+        </article>
+        <article class="card">
+          <h4>座談会（3〜4名）</h4>
+          <p class="desc">社内の空気感と人のつながり</p>
+          <p class="meta">動画の尺：8〜15分</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>30万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>40万円</strong></p>
+          </div>
+          <p class="tax-note">税別</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="menu-block" id="company">
+      <h3>03　会社</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">動画の種類</th>
+              <th scope="col">尺の目安</th>
+              <th class="num" scope="col">インタビューのみ<span>税別</span></th>
+              <th class="num" scope="col">仕事風景の撮影込み<span>税別</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
               <th scope="row">
                 <span class="name">会社紹介</span>
                 <span class="desc">会社の全体像をひと目で</span>
               </th>
-              <td class="cat">会社</td>
               <td class="duration">3〜5分</td>
-              <td class="price">45万円<span class="unit">（インサート込み）</span></td>
+              <td class="price" colspan="2">45万円<span class="unit">（インサート込み）</span></td>
             </tr>
-            <tr data-cat="company">
+            <tr>
               <th scope="row">
                 <span class="name">事業内容紹介</span>
                 <span class="desc">仕事の中身とビジネスモデル</span>
               </th>
-              <td class="cat">会社</td>
               <td class="duration">3〜5分</td>
-              <td class="price">45万円<span class="unit">（インサート込み）</span></td>
+              <td class="price" colspan="2">45万円<span class="unit">（インサート込み）</span></td>
             </tr>
-            <tr data-cat="company">
+            <tr>
               <th scope="row">
                 <span class="name">福利厚生紹介</span>
                 <span class="desc">制度を、使っている社員の声とともに</span>
               </th>
-              <td class="cat">会社</td>
               <td class="duration">3〜5分</td>
+              <td class="price">25万円</td>
               <td class="price">35万円</td>
             </tr>
-            <tr data-cat="company">
+            <tr>
               <th scope="row">
                 <span class="name">ルームツアー</span>
                 <span class="desc">働く環境とオフィスの雰囲気</span>
               </th>
-              <td class="cat">会社</td>
               <td class="duration">2〜4分</td>
-              <td class="price">25万円<span class="unit">（一律）</span></td>
+              <td class="price" colspan="2">25万円<span class="unit">（一律）</span></td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="cards">
-        <article class="card" data-cat="representative">
-          <p class="cat">代表</p>
-          <h3>代表者メッセージ</h3>
-          <p class="desc">求職者への直接の呼びかけ</p>
-          <p class="meta">動画の尺：2〜3分</p>
-          <p class="amount">30万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="representative">
-          <p class="cat">代表</p>
-          <h3>事業計画</h3>
-          <p class="desc">これからの事業と成長の道筋</p>
-          <p class="meta">動画の尺：3〜5分</p>
-          <p class="amount">35万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="representative">
-          <p class="cat">代表</p>
-          <h3>代表が答える100の質問</h3>
-          <p class="desc">人柄がテンポよく伝わる</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount na">対象外</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>社員紹介（1名）</h3>
-          <p class="desc">一人のリアルなキャリアと人柄</p>
-          <p class="meta">動画の尺：2〜3分</p>
-          <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
-          <p class="amount">30万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>社員が答える100の質問</h3>
-          <p class="desc">等身大の社員像がテンポよく伝わる</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount na">対象外</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>代表×社員 対談</h3>
-          <p class="desc">代表と現場の距離感</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">40万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>社員×社員 対談</h3>
-          <p class="desc">同期・先輩後輩・部署を越えた関係性</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">40万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="staff">
-          <p class="cat">社員</p>
-          <h3>座談会（3〜4名）</h3>
-          <p class="desc">社内の空気感と人のつながり</p>
-          <p class="meta">動画の尺：8〜15分</p>
-          <p class="amount">40万円</p>
-          <p class="tax-note">税別</p>
-        </article>
-        <article class="card" data-cat="company">
-          <p class="cat">会社</p>
-          <h3>会社紹介</h3>
+        <article class="card">
+          <h4>会社紹介</h4>
           <p class="desc">会社の全体像をひと目で</p>
           <p class="meta">動画の尺：3〜5分</p>
-          <p class="amount">45万円<span class="unit">（インサート込み）</span></p>
+          <div class="card-prices">
+            <p><span>料金</span><strong>45万円<span class="unit">（インサート込み）</span></strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card" data-cat="company">
-          <p class="cat">会社</p>
-          <h3>事業内容紹介</h3>
+        <article class="card">
+          <h4>事業内容紹介</h4>
           <p class="desc">仕事の中身とビジネスモデル</p>
           <p class="meta">動画の尺：3〜5分</p>
-          <p class="amount">45万円<span class="unit">（インサート込み）</span></p>
+          <div class="card-prices">
+            <p><span>料金</span><strong>45万円<span class="unit">（インサート込み）</span></strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card" data-cat="company">
-          <p class="cat">会社</p>
-          <h3>福利厚生紹介</h3>
+        <article class="card">
+          <h4>福利厚生紹介</h4>
           <p class="desc">制度を、使っている社員の声とともに</p>
           <p class="meta">動画の尺：3〜5分</p>
-          <p class="amount">35万円</p>
+          <div class="card-prices">
+            <p><span>インタビューのみ</span><strong>25万円</strong></p>
+            <p><span>仕事風景の撮影込み</span><strong>35万円</strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card" data-cat="company">
-          <p class="cat">会社</p>
-          <h3>ルームツアー</h3>
+        <article class="card">
+          <h4>ルームツアー</h4>
           <p class="desc">働く環境とオフィスの雰囲気</p>
           <p class="meta">動画の尺：2〜4分</p>
-          <p class="amount">25万円<span class="unit">（一律）</span></p>
+          <div class="card-prices">
+            <p><span>料金</span><strong>25万円<span class="unit">（一律）</span></strong></p>
+          </div>
           <p class="tax-note">税別</p>
         </article>
       </div>
@@ -770,101 +749,61 @@
 
     <hr class="rule">
 
-    <section class="block" id="series">
-      <h2>シリーズ</h2>
-      <p class="section-lead">1テーマ1本・各2〜3分。好きなテーマを組み合わせて制作できます。</p>
-      <div class="series">
-        <article>
-          <h3>代表が語るシリーズ</h3>
-          <p>代表の想いを、テーマごとに深く</p>
-          <ul class="themes">
-            <li>理念</li>
-            <li>価値観</li>
-            <li>会社の未来</li>
-            <li>入ってほしい人・合う人</li>
-            <li>社員</li>
-            <li>仕事への想い</li>
-            <li>福利厚生への想い</li>
-          </ul>
-        </article>
-        <article>
-          <h3>社員が語るシリーズ</h3>
-          <p>現場のリアルな声を、テーマごとに</p>
-          <ul class="themes">
-            <li>会社のいいところ</li>
-            <li>仕事のやりがい</li>
-            <li>入社して成長したこと</li>
-            <li>代表</li>
-            <li>仕事の大変なところ</li>
-          </ul>
-        </article>
+    <h2 id="series">シリーズ</h2>
+    <p class="section-lead">1テーマ1本・各2〜3分。好きなテーマを組み合わせて制作できます。</p>
+    <div class="series">
+      <article>
+        <h3>代表が語るシリーズ</h3>
+        <p>代表の想いを、テーマごとに深く</p>
+        <ul class="themes">
+          <li>理念</li>
+          <li>価値観</li>
+          <li>会社の未来</li>
+          <li>入ってほしい人・合う人</li>
+          <li>社員</li>
+          <li>仕事への想い</li>
+          <li>福利厚生への想い</li>
+        </ul>
+      </article>
+      <article>
+        <h3>社員が語るシリーズ</h3>
+        <p>現場のリアルな声を、テーマごとに</p>
+        <ul class="themes">
+          <li>会社のいいところ</li>
+          <li>仕事のやりがい</li>
+          <li>入社して成長したこと</li>
+          <li>代表</li>
+          <li>仕事の大変なところ</li>
+        </ul>
+      </article>
+    </div>
+    <div class="series-prices">
+      <div>
+        <span>1本の場合</span>
+        <strong>20万円</strong>
+        <em>税別</em>
       </div>
-      <div class="series-prices">
-        <div>
-          <span>1本の場合</span>
-          <strong>20万円</strong>
-          <em>税別</em>
-        </div>
-        <div>
-          <p class="tag">複数本がお得</p>
-          <span>2本以上（1本あたり）</span>
-          <strong>15万円</strong>
-          <em>税別</em>
-        </div>
+      <div>
+        <p class="tag">複数本がお得</p>
+        <span>2本以上（1本あたり）</span>
+        <strong>15万円</strong>
+        <em>税別</em>
       </div>
-    </section>
+    </div>
 
     <hr class="rule">
 
-    <section class="block">
-      <h2>追加料金・注意事項</h2>
-      <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インタビューのみか仕事風景の撮影を含むかの範囲です。次のものは別途です。</p>
-      <ul class="notes">
-        <li>この範囲を超える撮影</li>
-        <li>遠方の交通・宿泊</li>
-        <li>ナレーション手配</li>
-        <li>納品後の大幅な作り直し</li>
-      </ul>
-      <div class="foot">
-        <p>株式会社ファディー</p>
-      </div>
-    </section>
+    <h2>追加料金・注意事項</h2>
+    <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インタビューのみか仕事風景の撮影を含むかの範囲です。次のものは別途です。</p>
+    <ul class="notes">
+      <li>この範囲を超える撮影</li>
+      <li>遠方の交通・宿泊</li>
+      <li>ナレーション手配</li>
+      <li>納品後の大幅な作り直し</li>
+    </ul>
+    <div class="foot">
+      <p>株式会社ファディー</p>
+    </div>
   </main>
-  <script>
-    (function () {
-      var buttons = document.querySelectorAll("[data-filter]");
-      var items = document.querySelectorAll("[data-cat]");
-      var plans = document.querySelectorAll("[data-plan]");
-      var status = document.getElementById("filter-status");
-      var labels = {
-        all: "すべて",
-        representative: "代表",
-        staff: "社員",
-        company: "会社"
-      };
-
-      function apply(filter) {
-        buttons.forEach(function (button) {
-          button.setAttribute("aria-pressed", button.getAttribute("data-filter") === filter ? "true" : "false");
-        });
-        items.forEach(function (item) {
-          var show = filter === "all" || item.getAttribute("data-cat") === filter;
-          if (show) item.removeAttribute("hidden");
-          else item.setAttribute("hidden", "");
-        });
-        plans.forEach(function (plan) {
-          if (plan.querySelector("[data-cat]:not([hidden])")) plan.removeAttribute("hidden");
-          else plan.setAttribute("hidden", "");
-        });
-        status.textContent = labels[filter] + "のメニューを表示しています";
-      }
-
-      buttons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          apply(button.getAttribute("data-filter"));
-        });
-      });
-    })();
-  </script>
 </body>
 </html>
