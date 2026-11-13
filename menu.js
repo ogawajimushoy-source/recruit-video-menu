@@ -290,8 +290,24 @@
     });
   }
 
+  function applyAims(aims) {
+    if (!aims) return;
+    Object.keys(aims).forEach(function (id) {
+      var link = document.querySelector('.aims a[href="#' + id + '"]');
+      if (!link) return;
+      var fields = aims[id] || {};
+      var label = link.querySelector("span");
+      var title = link.querySelector("strong");
+      var examples = link.querySelector("em");
+      if (fields.label != null && label) label.textContent = fields.label;
+      if (fields.title != null && title) title.textContent = fields.title;
+      if (fields.examples != null && examples) examples.textContent = fields.examples;
+    });
+  }
+
   function apply(data) {
     data = data || {};
+    applyAims(data.aims);
     document.querySelectorAll("[data-extra]").forEach(function (node) { node.remove(); });
     stampBase();
     (data.removed || []).forEach(function (id) {

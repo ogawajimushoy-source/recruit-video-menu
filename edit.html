@@ -192,6 +192,11 @@
       text-decoration: underline;
       text-underline-offset: 3px;
     }
+    #stage .move-up, #stage .move-down {
+      font-size: 16px;
+      line-height: 1;
+      text-decoration: none;
+    }
     #stage .do-remove {
       color: var(--muted);
       font-size: 18px;
@@ -309,14 +314,6 @@
     <p id="editor-dirty" class="bar-note"></p>
     <p id="publish-result" class="bar-result" hidden></p>
   </header>
-  <div class="hint">
-    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。「一律」と「インサートあり/なし」で、料金の書き方を選べます。上へ・下へ、または「移動」のドラッグで並び替えられます。「×」で、もともとある項目も消せます。</p>
-    <nav>
-      <a href="#representative">代表</a>
-      <a href="#staff">社員</a>
-      <a href="#company">会社</a>
-    </nav>
-  </div>
   <form id="token-panel" class="token-panel" hidden>
     <p>公開には、GitHubで新しく作るトークンが必要です。ログインパスワードとは別で、<strong>github_pat_</strong> で始まる長い文字列です。作った直後の画面で一度だけ表示され、あとから同じ文字列を見返すことはできません。いま入っている文字列を入れ直しても、拒否されたままです。</p>
     <ol>
@@ -334,7 +331,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=7"></script>
+  <script src="menu.js?v=8"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -1100,8 +1097,18 @@
         items: [],
         order: { representative: [], staff: [], company: [] },
         overrides: {},
-        removed: Object.keys(removed)
+        removed: Object.keys(removed),
+        aims: {}
       };
+      document.querySelectorAll(".aims a").forEach(function (link) {
+        var id = (link.getAttribute("href") || "").replace("#", "");
+        if (!id) return;
+        payload.aims[id] = {
+          label: link.querySelector("span") ? link.querySelector("span").textContent.trim() : "",
+          title: link.querySelector("strong") ? link.querySelector("strong").textContent.trim() : "",
+          examples: link.querySelector("em") ? link.querySelector("em").textContent.trim() : ""
+        };
+      });
       eachMenuRow(function (tr, category) {
         var id = tr.dataset.id;
         payload.order[category].push(id);
@@ -1187,9 +1194,9 @@
         done = true;
         input.removeEventListener("blur", onBlur);
         var value = save ? input.value.trim() : original;
-        if (save && kind === "name" && !value) {
+        if (save && (kind === "name" || kind === "aim") && !value) {
           value = original;
-          setStatus("動画の名前を入力してください。", true);
+          setStatus(kind === "aim" ? "カードの文字を空にはできません。" : "動画の名前を入力してください。", true);
         }
         if (save && kind === "price") value = priceValue(value);
         delete element.dataset.editing;
@@ -1283,11 +1290,11 @@
       var grip = el("span", "grip", "移動");
       grip.draggable = true;
       grip.title = "ドラッグで並び替え";
-      tools.append(
-        grip,
-        button("text-btn move-up", "上へ", function () { moveRow(tr, -1); }),
-        button("text-btn move-down", "下へ", function () { moveRow(tr, 1); })
-      );
+      var up = button("text-btn move-up", "↑", function () { moveRow(tr, -1); });
+      var down = button("text-btn move-down", "↓", function () { moveRow(tr, 1); });
+      up.title = "上へ";
+      down.title = "下へ";
+      tools.append(grip, up, down);
       var modeBtn = button("text-btn do-mode", priceCells(tr).length === 1 ? "インサートあり/なし" : "一律", function () {
         var cells = priceCells(tr);
         if (cells.length === 1) {
@@ -1408,6 +1415,15 @@
       markDirty();
     }
 
+    function enhanceAims() {
+      document.querySelectorAll(".aims a").forEach(function (link) {
+        link.addEventListener("click", function (event) { event.preventDefault(); });
+        bindEdit(link.querySelector("span"), "aim");
+        bindEdit(link.querySelector("strong"), "aim");
+        bindEdit(link.querySelector("em"), "aim");
+      });
+    }
+
     function start(html, data) {
       var style = (html.match(/<style>([\s\S]*?)<\/style>/) || [])[1] || "";
       var main = (html.match(/<main class="sheet">[\s\S]*?<\/main>/) || [])[0] || "";
@@ -1427,6 +1443,7 @@
         state.videos[name] = data.videos[name] || "";
       });
       MenuKit.apply(data);
+      enhanceAims();
       eachMenuRow(function (tr) { enhanceRow(tr); });
       ensureAddButtons();
       savedRaw = rawSnapshot();
