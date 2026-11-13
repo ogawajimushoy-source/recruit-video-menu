@@ -135,20 +135,6 @@
       letter-spacing: 0.05em;
       line-height: 1.4;
     }
-    .section-head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 4px 24px;
-    }
-    .section-head p {
-      margin: 0 0 0 auto;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-      text-align: right;
-    }
     .section-lead {
       margin: 12px 0 0;
       color: #3a3834;
@@ -195,6 +181,30 @@
       font-weight: 500;
       letter-spacing: 0.08em;
     }
+    .block-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 4px 20px;
+      margin: 0 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .block-head h3 {
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .block-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0;
+      line-height: 1.6;
+      text-align: right;
+    }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     col.duration { width: 7.5rem; }
@@ -211,17 +221,19 @@
       padding: 0;
       background: #efeae1;
       color: var(--ink);
-      text-align: right;
+      text-align: center;
       white-space: nowrap;
     }
     thead th.num .pair {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      width: 100%;
     }
     thead th.num .col-label {
       display: block;
-      padding: 8px 12px;
+      padding: 8px 0;
       line-height: 1.4;
+      text-align: center;
     }
     tbody th, tbody td {
       padding: 20px 12px;
@@ -500,13 +512,13 @@
 
     <hr class="rule">
 
-    <div class="section-head">
-      <h2>単品メニュー</h2>
-      <p>インサート：オフィスや仕事風景の映像を差し込む追加撮影</p>
-    </div>
+    <h2>単品メニュー</h2>
 
     <section class="menu-block" id="representative">
-      <h3>01　代表</h3>
+      <div class="block-head">
+        <h3>01　代表</h3>
+        <p>インサート：オフィスや仕事風景の映像を差し込む追加撮影</p>
+      </div>
       <div class="table-wrap">
         <table>
           <colgroup>
