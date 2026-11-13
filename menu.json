@@ -1,6 +1,7 @@
 {
   "videos": {
-    "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM"
+    "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM",
+    "ルームツアー": "https://www.youtube.com/watch?v=ALVprGWm7-o"
   },
   "items": [
     {
@@ -10,8 +11,8 @@
       "description": "一日の流れを密着",
       "duration": "2〜3分",
       "video": "https://www.youtube.com/watch?v=vQmKygPI9WM",
-      "interview": "未定",
-      "workplace": "未定"
+      "single": "未定",
+      "note": "（一律）"
     },
     {
       "id": "row-1794462538667",
@@ -120,10 +121,11 @@
       "workplace": "35万円"
     },
     "ルームツアー": {
-      "name": "ルームツアー",
+      "name": "オフィスツアー",
       "description": "働く環境とオフィスの雰囲気",
       "duration": "2〜4分",
-      "single": "25万円（一律）"
+      "single": "25万円",
+      "note": "（一律）"
     }
   },
   "removed": [
