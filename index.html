@@ -339,64 +339,82 @@
       font-weight: 700;
       letter-spacing: 0.04em;
     }
-    .series p { margin: 8px 0 16px; color: var(--muted); font-size: 14px; }
+    .series p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
     .themes {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
       gap: 8px;
-      margin: 0;
+      margin: 18px 0 0;
       padding: 0;
       list-style: none;
     }
     .themes li {
+      position: relative;
       margin: 0;
-      padding: 6px 12px;
-      background: var(--pill);
-      color: var(--pill-ink);
-      border-radius: 6px;
-      font-size: 13px;
+      padding: 0 0 0 1.4em;
+      color: #3a3834;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .themes li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 700;
     }
     .series-prices {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4px;
+      gap: 16px;
       margin-top: 16px;
-      padding: 8px;
-      background: var(--green);
-      color: #f7f4ee;
+    }
+    .series-prices article {
+      margin: 0;
+      padding: 26px 24px 22px;
+      background: var(--card);
+      border: 1px solid #ebe4d8;
       border-radius: 8px;
     }
-    .series-prices div { padding: 18px 22px 20px; }
-    .series-prices .tag {
-      display: inline-block;
-      margin: 0 0 10px;
-      padding: 2px 8px;
-      background: rgba(255, 252, 248, 0.16);
-      border-radius: 4px;
+    .series-prices h3 {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    .series-prices .plan-note {
+      margin: 0;
+      color: var(--green);
       font-size: 12px;
+      font-weight: 500;
       letter-spacing: 0.06em;
     }
-    .series-prices span {
-      display: block;
-      font-size: 13px;
-      opacity: 0.92;
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin: 14px 0 0;
+      color: var(--ink);
     }
-    .series-prices strong {
-      display: block;
-      margin-top: 4px;
+    .plan-price strong {
       font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
-      font-size: 40px;
+      font-size: 42px;
       font-weight: 700;
-      letter-spacing: 0.02em;
-      line-height: 1.2;
+      letter-spacing: 0;
+      line-height: 1;
     }
-    .series-prices em {
-      display: block;
-      margin-top: 4px;
-      font-style: normal;
+    .plan-price span {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .plan-tax {
+      margin: 8px 0 0;
+      color: var(--muted);
       font-size: 13px;
       letter-spacing: 0.06em;
-      opacity: 0.9;
     }
     .notes { margin: 22px 0 0; padding: 0; }
     .notes li { margin: 0 0 6px; }
@@ -793,17 +811,16 @@
       </article>
     </div>
     <div class="series-prices">
-      <div>
-        <span>1本の場合</span>
-        <strong>20万円</strong>
-        <em>税別</em>
-      </div>
-      <div>
-        <p class="tag">複数本がお得</p>
-        <span>2本以上（1本あたり）</span>
-        <strong>15万円</strong>
-        <em>税別</em>
-      </div>
+      <article>
+        <h3>1本の場合</h3>
+        <p class="plan-price"><strong>20</strong><span>万円/本</span></p>
+        <p class="plan-tax">税別</p>
+      </article>
+      <article>
+        <h3>2本以上<span class="plan-note">複数本がお得</span></h3>
+        <p class="plan-price"><strong>15</strong><span>万円/本</span></p>
+        <p class="plan-tax">税別・1本あたり</p>
+      </article>
     </div>
 
     <hr class="rule">
