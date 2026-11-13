@@ -332,6 +332,13 @@
       border: 1px solid #ebe4d8;
       border-radius: 8px;
     }
+    .series-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 28px;
+    }
     .series h3 {
       display: flex;
       align-items: center;
@@ -350,10 +357,10 @@
       border-radius: 2px;
     }
     .series-lead {
-      margin: 8px 0 0;
+      margin: 6px 0 0;
       padding-left: 14px;
       color: var(--muted);
-      font-size: 15px;
+      font-size: 14px;
     }
     .series-line {
       margin: 16px 0;
@@ -362,15 +369,15 @@
     }
     .plan {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       align-items: flex-end;
-      justify-content: space-between;
-      gap: 8px 24px;
+      gap: 4px;
+      margin-left: auto;
     }
     .plan-main {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       margin: 0;
     }
     .plan-badge {
@@ -385,25 +392,19 @@
     .plan-main strong {
       color: var(--green);
       font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
-      font-size: 40px;
+      font-size: 36px;
       font-weight: 700;
       letter-spacing: 0;
       line-height: 1;
       white-space: nowrap;
     }
-    .plan-main strong span { font-size: 22px; }
+    .plan-main strong span { font-size: 20px; }
     .plan-single {
-      margin: 0 0 2px auto;
+      margin: 0;
       color: var(--ink);
-      font-size: 15px;
+      font-size: 14px;
       text-align: right;
-    }
-    .plan-single span {
-      display: block;
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.06em;
+      white-space: nowrap;
     }
     .themes {
       display: grid;
@@ -455,7 +456,9 @@
     }
     @media (max-width: 599px) {
       .aims, .choices, .themes { grid-template-columns: 1fr; }
-      .plan-main strong { font-size: 34px; }
+      .series-head { align-items: flex-start; }
+      .plan { align-items: flex-start; margin-left: 0; }
+      .plan-main strong { font-size: 32px; }
       .table-wrap { display: none; }
       .cards { display: block; }
       h1 { font-size: 32px; }
@@ -807,12 +810,15 @@
     <p class="section-lead">1テーマ1本・各2〜3分。好きなテーマを組み合わせて制作できます。</p>
     <div class="series">
       <article>
-        <h3>代表が語るシリーズ</h3>
-        <p class="series-lead">代表の想いを、テーマごとに深く</p>
-        <hr class="series-line">
-        <div class="plan">
-          <p class="plan-main"><span class="plan-badge">2本以上で</span><strong>15万円<span>/本</span></strong></p>
-          <p class="plan-single">1本のみ 20万円<span>税別</span></p>
+        <div class="series-head">
+          <div>
+            <h3>代表が語るシリーズ</h3>
+            <p class="series-lead">代表の想いを、テーマごとに深く</p>
+          </div>
+          <div class="plan">
+            <p class="plan-main"><span class="plan-badge">2本以上で</span><strong>15万円<span>/本</span></strong></p>
+            <p class="plan-single">1本のみ 20万円（税別）</p>
+          </div>
         </div>
         <hr class="series-line">
         <ul class="themes">
@@ -826,12 +832,15 @@
         </ul>
       </article>
       <article>
-        <h3>社員が語るシリーズ</h3>
-        <p class="series-lead">現場のリアルな声を、テーマごとに</p>
-        <hr class="series-line">
-        <div class="plan">
-          <p class="plan-main"><span class="plan-badge">2本以上で</span><strong>15万円<span>/本</span></strong></p>
-          <p class="plan-single">1本のみ 20万円<span>税別</span></p>
+        <div class="series-head">
+          <div>
+            <h3>社員が語るシリーズ</h3>
+            <p class="series-lead">現場のリアルな声を、テーマごとに</p>
+          </div>
+          <div class="plan">
+            <p class="plan-main"><span class="plan-badge">2本以上で</span><strong>15万円<span>/本</span></strong></p>
+            <p class="plan-single">1本のみ 20万円（税別）</p>
+          </div>
         </div>
         <hr class="series-line">
         <ul class="themes">
