@@ -24,14 +24,14 @@
       "workplace": "45万円"
     },
     {
-      "id": "row-1794462519901",
+      "id": "row-1794529192476",
       "category": "company",
-      "name": "新しい動画",
-      "description": "",
+      "name": "事業内容紹介",
+      "description": "仕事の中身とビジネスモデル",
       "duration": "2〜3分",
       "video": "",
-      "interview": "",
-      "workplace": ""
+      "interview": "-",
+      "workplace": "45万円"
     }
   ],
   "order": {
@@ -50,11 +50,9 @@
     ],
     "company": [
       "row-1794462538667",
-      "会社紹介",
-      "事業内容紹介",
+      "row-1794529192476",
       "福利厚生紹介",
-      "ルームツアー",
-      "row-1794462519901"
+      "ルームツアー"
     ]
   },
   "overrides": {
@@ -114,18 +112,6 @@
       "interview": "30万円",
       "workplace": "40万円"
     },
-    "会社紹介": {
-      "name": "会社紹介（削除）",
-      "description": "会社の全体像をひと目で",
-      "duration": "3〜5分",
-      "single": "45万円"
-    },
-    "事業内容紹介": {
-      "name": "事業内容紹介",
-      "description": "仕事の中身とビジネスモデル",
-      "duration": "3〜5分",
-      "single": "45万円"
-    },
     "福利厚生紹介": {
       "name": "福利厚生紹介",
       "description": "制度を、使っている社員の声とともに",
@@ -140,5 +126,8 @@
       "single": "25万円（一律）"
     }
   },
-  "removed": []
+  "removed": [
+    "事業内容紹介",
+    "会社紹介"
+  ]
 }
