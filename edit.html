@@ -260,7 +260,8 @@
     #stage .series-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
     #stage .themes li { align-items: center; }
     #stage .theme-name { flex: 1; min-width: 0; }
-    #stage .add-theme { margin-top: 12px; }
+    #stage .add-theme, #stage .add-note { margin-top: 12px; }
+    #stage .notes .text-btn { margin-left: 8px; }
     #stage .grip { cursor: grab; color: var(--muted); font-size: 13px; }
     #stage tr.drop-target { outline: 2px solid var(--green); outline-offset: -2px; }
     @media (max-width: 700px) {
@@ -335,7 +336,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=9"></script>
+  <script src="menu.js?v=10"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -1127,6 +1128,17 @@
           themes: themes
         });
       });
+      var notesHeading = document.getElementById("notes");
+      var notesLead = notesHeading && notesHeading.nextElementSibling;
+      payload.notesIntro = {
+        title: notesHeading ? notesHeading.textContent.trim() : "",
+        lead: notesLead && notesLead.classList.contains("section-lead") ? notesLead.textContent.trim() : ""
+      };
+      payload.notes = [];
+      document.querySelectorAll(".notes .note-name").forEach(function (node) {
+        var text = node.textContent.trim();
+        if (text) payload.notes.push(text);
+      });
       document.querySelectorAll(".aims a").forEach(function (link) {
         var id = (link.getAttribute("href") || "").replace("#", "");
         if (!id) return;
@@ -1221,16 +1233,20 @@
         done = true;
         input.removeEventListener("blur", onBlur);
         var value = save ? input.value.trim() : original;
-        if (save && kind === "theme" && !value) {
+        if (save && (kind === "theme" || kind === "note") && !value) {
           var themeItem = element.closest("li");
           delete element.dataset.editing;
           if (themeItem) themeItem.remove();
           markDirty();
           return;
         }
-        if (save && (kind === "name" || kind === "aim" || kind === "series-title") && !value) {
+        if (save && (kind === "name" || kind === "aim" || kind === "series-title" || kind === "note-title") && !value) {
           value = original;
-          setStatus(kind === "series-title" ? "シリーズの名前を空にはできません。" : kind === "aim" ? "カードの文字を空にはできません。" : "動画の名前を入力してください。", true);
+          var emptyMessage = "動画の名前を入力してください。";
+          if (kind === "series-title") emptyMessage = "シリーズの名前を空にはできません。";
+          if (kind === "note-title") emptyMessage = "見出しを空にはできません。";
+          if (kind === "aim") emptyMessage = "カードの文字を空にはできません。";
+          setStatus(emptyMessage, true);
         }
         if (save && kind === "price") value = priceValue(value);
         delete element.dataset.editing;
@@ -1544,6 +1560,44 @@
       host.after(add);
     }
 
+    function enhanceNote(li) {
+      if (li.dataset.ready === "1") return;
+      li.dataset.ready = "1";
+      bindEdit(li.querySelector(".note-name"), "note");
+      var up = button("text-btn move-up", "↑", function () { moveSibling(li, -1); });
+      var down = button("text-btn move-down", "↓", function () { moveSibling(li, 1); });
+      up.title = "上へ";
+      down.title = "下へ";
+      var remove = button("text-btn do-remove", "×", function () {
+        li.remove();
+        markDirty();
+      });
+      remove.title = "この項目を消す";
+      remove.setAttribute("aria-label", "この項目を消す");
+      li.append(up, down, remove);
+    }
+
+    function enhanceNotes() {
+      var heading = document.getElementById("notes");
+      bindEdit(heading, "note-title");
+      var intro = heading && heading.nextElementSibling;
+      if (intro && intro.classList.contains("section-lead")) bindEdit(intro, "desc");
+      document.querySelectorAll(".notes li").forEach(enhanceNote);
+      var host = document.querySelector("ul.notes");
+      if (!host || document.querySelector(".add-note")) return;
+      var add = button("text-btn add-note", "＋ 項目を追加", function () {
+        var li = document.createElement("li");
+        var name = document.createElement("span");
+        name.className = "note-name";
+        name.textContent = "新しい項目";
+        li.appendChild(name);
+        host.appendChild(li);
+        enhanceNote(li);
+        markDirty();
+      });
+      host.after(add);
+    }
+
     function start(html, data) {
       var style = (html.match(/<style>([\s\S]*?)<\/style>/) || [])[1] || "";
       var main = (html.match(/<main class="sheet">[\s\S]*?<\/main>/) || [])[0] || "";
@@ -1565,6 +1619,7 @@
       MenuKit.apply(data);
       enhanceAims();
       enhanceSeries();
+      enhanceNotes();
       eachMenuRow(function (tr) { enhanceRow(tr); });
       ensureAddButtons();
       savedRaw = rawSnapshot();

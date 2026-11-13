@@ -357,6 +357,34 @@
     });
   }
 
+  function noteItem(text) {
+    var li = document.createElement("li");
+    var name = document.createElement("span");
+    name.className = "note-name";
+    name.textContent = text;
+    li.appendChild(name);
+    return li;
+  }
+
+  function applyNotes(data) {
+    var heading = document.getElementById("notes");
+    if (data.notesIntro && heading) {
+      if (data.notesIntro.title != null) heading.textContent = data.notesIntro.title;
+      var intro = heading.nextElementSibling;
+      if (intro && intro.classList.contains("section-lead") && data.notesIntro.lead != null) {
+        intro.textContent = data.notesIntro.lead;
+      }
+    }
+    if (!Array.isArray(data.notes)) return;
+    var host = document.querySelector("ul.notes");
+    if (!host) return;
+    host.textContent = "";
+    data.notes.forEach(function (text) {
+      var line = String(text || "").trim();
+      if (line) host.appendChild(noteItem(line));
+    });
+  }
+
   function applyAims(aims) {
     if (!aims) return;
     Object.keys(aims).forEach(function (id) {
@@ -376,6 +404,7 @@
     data = data || {};
     applyAims(data.aims);
     applySeries(data);
+    applyNotes(data);
     document.querySelectorAll("[data-extra]").forEach(function (node) { node.remove(); });
     stampBase();
     (data.removed || []).forEach(function (id) {
