@@ -322,99 +322,119 @@
     }
     .series {
       display: grid;
-      grid-template-columns: 1fr 1fr;
       gap: 16px;
       margin-top: 28px;
     }
     .series article {
       margin: 0;
-      padding: 26px 24px 22px;
+      padding: 26px 28px 22px;
       background: var(--card);
       border: 1px solid #ebe4d8;
       border-radius: 8px;
     }
     .series h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin: 0;
-      font-size: 20px;
+      color: var(--green);
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: 0.04em;
     }
-    .series p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+    .series h3::before {
+      content: "";
+      width: 4px;
+      height: 1.05em;
+      background: var(--green);
+      border-radius: 2px;
+    }
+    .series-lead {
+      margin: 8px 0 0;
+      padding-left: 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .series-line {
+      margin: 16px 0;
+      border: 0;
+      border-top: 1px solid var(--line);
+    }
+    .plan {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px 24px;
+    }
+    .plan-main {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0;
+    }
+    .plan-badge {
+      padding: 6px 12px;
+      background: var(--pill);
+      color: var(--green);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .plan-main strong {
+      color: var(--green);
+      font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .plan-main strong span { font-size: 22px; }
+    .plan-single {
+      margin: 0 0 2px auto;
+      color: var(--ink);
+      font-size: 15px;
+      text-align: right;
+    }
+    .plan-single span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
     .themes {
       display: grid;
-      gap: 8px;
-      margin: 18px 0 0;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 28px;
+      margin: 0;
       padding: 0;
       list-style: none;
     }
     .themes li {
-      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
       margin: 0;
-      padding: 0 0 0 1.4em;
-      color: #3a3834;
-      font-size: 14px;
+      color: var(--ink);
+      font-size: 15px;
       line-height: 1.5;
     }
     .themes li::before {
       content: "✓";
-      position: absolute;
-      left: 0;
-      color: var(--green);
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
       font-weight: 700;
-    }
-    .series-prices {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .series-prices article {
-      margin: 0;
-      padding: 26px 24px 22px;
-      background: var(--card);
-      border: 1px solid #ebe4d8;
-      border-radius: 8px;
-    }
-    .series-prices h3 {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 0;
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-    }
-    .series-prices .plan-note {
-      margin: 0;
-      color: var(--green);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-    }
-    .plan-price {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-      margin: 14px 0 0;
-      color: var(--ink);
-    }
-    .plan-price strong {
-      font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
-      font-size: 42px;
-      font-weight: 700;
-      letter-spacing: 0;
-      line-height: 1;
-    }
-    .plan-price span {
-      font-size: 16px;
-      font-weight: 500;
-    }
-    .plan-tax {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: 0.06em;
+      line-height: 18px;
+      text-align: center;
     }
     .notes { margin: 22px 0 0; padding: 0; }
     .notes li { margin: 0 0 6px; }
@@ -434,7 +454,8 @@
       h2 { font-size: 28px; }
     }
     @media (max-width: 599px) {
-      .aims, .choices, .series, .series-prices { grid-template-columns: 1fr; }
+      .aims, .choices, .themes { grid-template-columns: 1fr; }
+      .plan-main strong { font-size: 34px; }
       .table-wrap { display: none; }
       .cards { display: block; }
       h1 { font-size: 32px; }
@@ -787,7 +808,13 @@
     <div class="series">
       <article>
         <h3>代表が語るシリーズ</h3>
-        <p>代表の想いを、テーマごとに深く</p>
+        <p class="series-lead">代表の想いを、テーマごとに深く</p>
+        <hr class="series-line">
+        <div class="plan">
+          <p class="plan-main"><span class="plan-badge">2本以上で</span><strong>15万円<span>/本</span></strong></p>
+          <p class="plan-single">1本のみ 20万円<span>税別</span></p>
+        </div>
+        <hr class="series-line">
         <ul class="themes">
           <li>理念</li>
           <li>価値観</li>
@@ -800,7 +827,13 @@
       </article>
       <article>
         <h3>社員が語るシリーズ</h3>
-        <p>現場のリアルな声を、テーマごとに</p>
+        <p class="series-lead">現場のリアルな声を、テーマごとに</p>
+        <hr class="series-line">
+        <div class="plan">
+          <p class="plan-main"><span class="plan-badge">2本以上で</span><strong>15万円<span>/本</span></strong></p>
+          <p class="plan-single">1本のみ 20万円<span>税別</span></p>
+        </div>
+        <hr class="series-line">
         <ul class="themes">
           <li>会社のいいところ</li>
           <li>仕事のやりがい</li>
@@ -808,18 +841,6 @@
           <li>代表</li>
           <li>仕事の大変なところ</li>
         </ul>
-      </article>
-    </div>
-    <div class="series-prices">
-      <article>
-        <h3>1本の場合</h3>
-        <p class="plan-price"><strong>20</strong><span>万円/本</span></p>
-        <p class="plan-tax">税別</p>
-      </article>
-      <article>
-        <h3>2本以上<span class="plan-note">複数本がお得</span></h3>
-        <p class="plan-price"><strong>15</strong><span>万円/本</span></p>
-        <p class="plan-tax">税別・1本あたり</p>
       </article>
     </div>
 
