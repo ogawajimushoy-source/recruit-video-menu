@@ -82,13 +82,35 @@
     current.href = url;
   }
 
+  function peelNote(value) {
+    var text = String(value || "");
+    var match = text.match(/（一律）|（インサート込み）/);
+    if (!match) return { amount: text, note: "" };
+    return { amount: text.replace(match[0], "").trim(), note: match[0] };
+  }
+
+  function renderNoted(cell, value, note) {
+    var shown = showPrice(value);
+    cell.classList.toggle("na", shown.empty);
+    cell.textContent = "";
+    if (!note || shown.empty) {
+      cell.textContent = shown.text;
+      return;
+    }
+    cell.append(document.createTextNode(shown.text));
+    var unit = document.createElement("span");
+    unit.className = "unit";
+    unit.textContent = note;
+    cell.append(unit);
+  }
+
   function setPriceCell(cell, value) {
     var shown = showPrice(value);
     cell.classList.toggle("na", shown.empty);
     cell.textContent = shown.text;
   }
 
-  function priceLine(label, value) {
+  function priceLine(label, value, note) {
     var line = document.createElement("p");
     var span = document.createElement("span");
     span.textContent = label;
@@ -96,6 +118,12 @@
     var strong = document.createElement("strong");
     if (shown.empty) strong.className = "na";
     strong.textContent = shown.text;
+    if (note && !shown.empty) {
+      var unit = document.createElement("span");
+      unit.className = "unit";
+      unit.textContent = note;
+      strong.append(unit);
+    }
     line.append(span, strong);
     return line;
   }
@@ -109,7 +137,8 @@
     if (isSingle(fields)) {
       if (cells[1]) cells[1].remove();
       cells[0].colSpan = 2;
-      setPriceCell(cells[0], fields.single);
+      var peeled = peelNote(fields.single);
+      renderNoted(cells[0], peeled.amount, fields.note || peeled.note);
       return;
     }
     if (cells.length === 1) {
@@ -141,9 +170,8 @@
     if (!prices) return;
     prices.textContent = "";
     if (isSingle(fields)) {
-      var text = yen(fields.single);
-      if (fields.note && text.indexOf(fields.note) === -1) text += fields.note;
-      prices.append(priceLine("料金", text));
+      var peeled = peelNote(fields.single);
+      prices.append(priceLine("料金", peeled.amount, fields.note || peeled.note));
       return;
     }
     prices.append(priceLine(PRICE_LABELS[0], fields.interview));
@@ -181,9 +209,8 @@
       var single = document.createElement("td");
       single.className = "price";
       single.colSpan = 2;
-      var singleText = yen(item.single);
-      if (item.note && singleText.indexOf(item.note) === -1) singleText += item.note;
-      setPriceCell(single, singleText);
+      var peeled = peelNote(item.single);
+      renderNoted(single, peeled.amount, item.note || peeled.note);
       row.append(single);
     } else {
       [item.interview, item.workplace].forEach(function (value) {

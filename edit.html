@@ -310,7 +310,7 @@
     <p id="publish-result" class="bar-result" hidden></p>
   </header>
   <div class="hint">
-    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。上へ・下へ、または「移動」のドラッグで並び替えられます。「×」で、もともとある項目も消せます。</p>
+    <p>お客さまに見せる料金表です。タイトル、説明、尺、金額はダブルクリックで編集できます。金額には「応相談」などの日本語も入れられます。「一律」と「インサートあり/なし」で、料金の書き方を選べます。上へ・下へ、または「移動」のドラッグで並び替えられます。「×」で、もともとある項目も消せます。</p>
     <nav>
       <a href="#representative">代表</a>
       <a href="#staff">社員</a>
@@ -334,7 +334,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=6"></script>
+  <script src="menu.js?v=7"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -1019,18 +1019,71 @@
       });
     }
 
-    function readRow(tr) {
-      var cells = [];
-      Array.prototype.forEach.call(tr.children, function (child) {
-        if (child.classList.contains("price")) cells.push(child);
+    function priceCells(tr) {
+      return Array.prototype.filter.call(tr.children, function (child) {
+        return child.classList.contains("price");
       });
+    }
+
+    function cellAmount(cell) {
+      var amount = cell.querySelector(".amount");
+      if (amount) return amount.textContent.trim();
+      var unit = cell.querySelector(".unit");
+      var text = cell.textContent;
+      if (unit) text = text.replace(unit.textContent, "");
+      return text.replace(/（一律）|（インサート込み）/g, "").trim();
+    }
+
+    function cellNote(cell) {
+      var unit = cell.querySelector(".unit");
+      if (unit) return unit.textContent.trim();
+      var match = cell.textContent.match(/（一律）|（インサート込み）/);
+      return match ? match[0] : "";
+    }
+
+    function paintSingle(cell, amount, note) {
+      var fresh = document.createElement("td");
+      fresh.className = "price";
+      fresh.colSpan = 2;
+      var shown = MenuKit.showPrice(amount);
+      var amountEl = document.createElement("span");
+      amountEl.className = shown.empty ? "amount na" : "amount";
+      amountEl.textContent = shown.text;
+      var unit = document.createElement("span");
+      unit.className = "unit";
+      unit.textContent = note || "（一律）";
+      fresh.append(amountEl, unit);
+      cell.replaceWith(fresh);
+      bindEdit(amountEl, "price");
+      return fresh;
+    }
+
+    function paintSplit(cell, amount) {
+      var fresh = document.createElement("td");
+      fresh.className = "price";
+      var shown = MenuKit.showPrice(amount);
+      fresh.textContent = shown.text;
+      fresh.classList.toggle("na", shown.empty);
+      var second = document.createElement("td");
+      second.className = "price na";
+      second.textContent = "対象外";
+      cell.replaceWith(fresh);
+      fresh.after(second);
+      bindEdit(fresh, "price");
+      bindEdit(second, "price");
+    }
+
+    function readRow(tr) {
+      var cells = priceCells(tr);
       var fields = {
         name: tr.querySelector(".name") ? tr.querySelector(".name").textContent.trim() : "",
         description: tr.querySelector(".desc") ? tr.querySelector(".desc").textContent.trim() : "",
         duration: tr.querySelector("td.duration") ? tr.querySelector("td.duration").textContent.trim() : ""
       };
-      if (cells.length === 1) fields.single = cells[0].textContent.trim();
-      else {
+      if (cells.length === 1) {
+        fields.single = cellAmount(cells[0]);
+        fields.note = cellNote(cells[0]) || "（一律）";
+      } else {
         fields.interview = cells[0] ? cells[0].textContent.trim() : "";
         fields.workplace = cells[1] ? cells[1].textContent.trim() : "";
       }
@@ -1055,8 +1108,11 @@
         var fields = readRow(tr);
         var video = (tr.querySelector(".video-input") || {}).value || "";
         video = video.trim();
-        if (fields.single != null) fields.single = priceValue(fields.single);
-        else {
+        if (fields.single != null) {
+          fields.single = priceValue(fields.single);
+          if (fields.single === "対象外") delete fields.note;
+          else if (!fields.note) fields.note = "（一律）";
+        } else {
           fields.interview = priceValue(fields.interview);
           fields.workplace = priceValue(fields.workplace);
         }
@@ -1069,8 +1125,10 @@
             duration: fields.duration,
             video: MenuKit.safeUrl(video)
           };
-          if (fields.single != null) item.single = fields.single === "対象外" ? "" : fields.single;
-          else {
+          if (fields.single != null) {
+            item.single = fields.single === "対象外" ? "" : fields.single;
+            if (fields.note && item.single) item.note = fields.note;
+          } else {
             item.interview = fields.interview === "対象外" ? "" : fields.interview;
             item.workplace = fields.workplace === "対象外" ? "" : fields.workplace;
           }
@@ -1166,8 +1224,10 @@
       if (!card) return;
       var fields = readRow(tr);
       var payload = { name: fields.name, description: fields.description, duration: fields.duration };
-      if (fields.single != null) payload.single = fields.single;
-      else {
+      if (fields.single != null) {
+        payload.single = fields.single;
+        payload.note = fields.note || "";
+      } else {
         payload.interview = fields.interview;
         payload.workplace = fields.workplace;
       }
@@ -1180,7 +1240,7 @@
       var prices = card.querySelector(".card-prices");
       if (!prices) return;
       prices.textContent = "";
-      function line(label, value) {
+      function line(label, value, note) {
         var row = document.createElement("p");
         var span = document.createElement("span");
         span.textContent = label;
@@ -1188,10 +1248,16 @@
         var strong = document.createElement("strong");
         if (shown.empty) strong.className = "na";
         strong.textContent = shown.text;
+        if (note && !shown.empty) {
+          var unit = document.createElement("span");
+          unit.className = "unit";
+          unit.textContent = note;
+          strong.append(unit);
+        }
         row.append(span, strong);
         prices.append(row);
       }
-      if (payload.single != null) line("料金", payload.single);
+      if (payload.single != null) line("料金", payload.single, payload.note);
       else {
         line("インサートなし", payload.interview);
         line("インサートあり", payload.workplace);
@@ -1222,6 +1288,22 @@
         button("text-btn move-up", "上へ", function () { moveRow(tr, -1); }),
         button("text-btn move-down", "下へ", function () { moveRow(tr, 1); })
       );
+      var modeBtn = button("text-btn do-mode", priceCells(tr).length === 1 ? "インサートあり/なし" : "一律", function () {
+        var cells = priceCells(tr);
+        if (cells.length === 1) {
+          paintSplit(cells[0], cellAmount(cells[0]));
+        } else {
+          var amount = cellAmount(cells[0]);
+          if (!amount || amount === "対象外") amount = cellAmount(cells[1]);
+          cells[1].remove();
+          paintSingle(cells[0], amount, "（一律）");
+        }
+        modeBtn.textContent = priceCells(tr).length === 1 ? "インサートあり/なし" : "一律";
+        syncCard(tr);
+        markDirty();
+      });
+      modeBtn.title = "料金の書き方を切り替える";
+      tools.append(modeBtn);
       var remove = button("text-btn do-remove", "×", function () {
         var section = tr.closest("section");
         if (tr.dataset.extra !== "1") removed[tr.dataset.id] = true;
@@ -1241,7 +1323,15 @@
       bindEdit(tr.querySelector(".desc"), "desc");
       bindEdit(tr.querySelector("td.duration"), "duration");
       Array.prototype.forEach.call(tr.children, function (child) {
-        if (child.classList.contains("price")) bindEdit(child, "price");
+        if (!child.classList.contains("price")) return;
+        var amount = child.querySelector(".amount");
+        if (!amount && child.querySelector(".unit")) {
+          var note = child.querySelector(".unit").textContent;
+          var value = child.textContent.replace(note, "").trim();
+          paintSingle(child, value, note);
+          return;
+        }
+        bindEdit(amount || child, "price");
       });
       var link = th.querySelector("a.sample");
       var initial = "";

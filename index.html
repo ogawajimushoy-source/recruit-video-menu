@@ -219,8 +219,8 @@
     }
     thead th.num {
       padding: 0;
-      background: #efeae1;
-      color: var(--ink);
+      background: none;
+      color: inherit;
       text-align: center;
       white-space: nowrap;
     }
@@ -278,7 +278,12 @@
     }
     .unit {
       margin-left: 4px;
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .price .unit,
+    .card-prices strong .unit {
+      font-size: 12px;
       font-weight: 500;
     }
     .na {
