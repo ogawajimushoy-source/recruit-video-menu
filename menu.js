@@ -290,6 +290,73 @@
     });
   }
 
+  function seriesArticle(item) {
+    item = item || {};
+    var article = document.createElement("article");
+    var head = document.createElement("div");
+    head.className = "series-head";
+    var titles = document.createElement("div");
+    var h3 = document.createElement("h3");
+    h3.textContent = item.title || "新しいシリーズ";
+    var lead = document.createElement("p");
+    lead.className = "series-lead";
+    lead.textContent = item.lead || "";
+    titles.append(h3, lead);
+    var plan = document.createElement("div");
+    plan.className = "plan";
+    var main = document.createElement("p");
+    main.className = "plan-main";
+    var badge = document.createElement("span");
+    badge.className = "plan-badge";
+    badge.textContent = item.badge || "2本以上で";
+    var strong = document.createElement("strong");
+    var amount = document.createElement("span");
+    amount.className = "plan-amount";
+    amount.textContent = item.price || "15万円";
+    var unit = document.createElement("span");
+    unit.className = "plan-unit";
+    unit.textContent = item.unit != null ? item.unit : "/本";
+    strong.append(amount, unit);
+    main.append(badge, strong);
+    var single = document.createElement("p");
+    single.className = "plan-single";
+    single.textContent = item.single || "1本のみ 20万円（税別）";
+    plan.append(main, single);
+    head.append(titles, plan);
+    var rule = document.createElement("hr");
+    rule.className = "series-line";
+    var list = document.createElement("ul");
+    list.className = "themes";
+    (item.themes || []).forEach(function (theme) {
+      var li = document.createElement("li");
+      var name = document.createElement("span");
+      name.className = "theme-name";
+      name.textContent = theme;
+      li.appendChild(name);
+      list.appendChild(li);
+    });
+    article.append(head, rule, list);
+    return article;
+  }
+
+  function applySeries(data) {
+    var heading = document.getElementById("series");
+    if (data.seriesIntro && heading) {
+      if (data.seriesIntro.title != null) heading.textContent = data.seriesIntro.title;
+      var intro = heading.nextElementSibling;
+      if (intro && intro.classList.contains("section-lead") && data.seriesIntro.lead != null) {
+        intro.textContent = data.seriesIntro.lead;
+      }
+    }
+    if (!Array.isArray(data.series)) return;
+    var host = document.querySelector(".series");
+    if (!host) return;
+    host.textContent = "";
+    data.series.forEach(function (item) {
+      host.appendChild(seriesArticle(item));
+    });
+  }
+
   function applyAims(aims) {
     if (!aims) return;
     Object.keys(aims).forEach(function (id) {
@@ -308,6 +375,7 @@
   function apply(data) {
     data = data || {};
     applyAims(data.aims);
+    applySeries(data);
     document.querySelectorAll("[data-extra]").forEach(function (node) { node.remove(); });
     stampBase();
     (data.removed || []).forEach(function (id) {
@@ -348,6 +416,7 @@
     showPrice: showPrice,
     apply: apply,
     addItem: appendItem,
+    seriesArticle: seriesArticle,
     load: load
   };
 })();

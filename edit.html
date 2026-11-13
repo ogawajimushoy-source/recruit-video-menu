@@ -257,6 +257,10 @@
     }
     #stage td.price .inline-edit { font-size: 24px; font-weight: 700; text-align: right; }
     #stage .row-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 6px; }
+    #stage .series-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
+    #stage .themes li { align-items: center; }
+    #stage .theme-name { flex: 1; min-width: 0; }
+    #stage .add-theme { margin-top: 12px; }
     #stage .grip { cursor: grab; color: var(--muted); font-size: 13px; }
     #stage tr.drop-target { outline: 2px solid var(--green); outline-offset: -2px; }
     @media (max-width: 700px) {
@@ -331,7 +335,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=8"></script>
+  <script src="menu.js?v=9"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -1100,6 +1104,29 @@
         removed: Object.keys(removed),
         aims: {}
       };
+      var seriesHeading = document.getElementById("series");
+      var seriesLead = seriesHeading && seriesHeading.nextElementSibling;
+      payload.seriesIntro = {
+        title: seriesHeading ? seriesHeading.textContent.trim() : "",
+        lead: seriesLead && seriesLead.classList.contains("section-lead") ? seriesLead.textContent.trim() : ""
+      };
+      payload.series = [];
+      document.querySelectorAll(".series article").forEach(function (article) {
+        var themes = [];
+        article.querySelectorAll(".theme-name").forEach(function (node) {
+          var text = node.textContent.trim();
+          if (text) themes.push(text);
+        });
+        payload.series.push({
+          title: (article.querySelector("h3") || {}).textContent ? article.querySelector("h3").textContent.trim() : "",
+          lead: (article.querySelector(".series-lead") || {}).textContent ? article.querySelector(".series-lead").textContent.trim() : "",
+          badge: (article.querySelector(".plan-badge") || {}).textContent ? article.querySelector(".plan-badge").textContent.trim() : "",
+          price: (article.querySelector(".plan-amount") || {}).textContent ? article.querySelector(".plan-amount").textContent.trim() : "",
+          unit: (article.querySelector(".plan-unit") || {}).textContent ? article.querySelector(".plan-unit").textContent.trim() : "",
+          single: (article.querySelector(".plan-single") || {}).textContent ? article.querySelector(".plan-single").textContent.trim() : "",
+          themes: themes
+        });
+      });
       document.querySelectorAll(".aims a").forEach(function (link) {
         var id = (link.getAttribute("href") || "").replace("#", "");
         if (!id) return;
@@ -1194,9 +1221,16 @@
         done = true;
         input.removeEventListener("blur", onBlur);
         var value = save ? input.value.trim() : original;
-        if (save && (kind === "name" || kind === "aim") && !value) {
+        if (save && kind === "theme" && !value) {
+          var themeItem = element.closest("li");
+          delete element.dataset.editing;
+          if (themeItem) themeItem.remove();
+          markDirty();
+          return;
+        }
+        if (save && (kind === "name" || kind === "aim" || kind === "series-title") && !value) {
           value = original;
-          setStatus(kind === "aim" ? "カードの文字を空にはできません。" : "動画の名前を入力してください。", true);
+          setStatus(kind === "series-title" ? "シリーズの名前を空にはできません。" : kind === "aim" ? "カードの文字を空にはできません。" : "動画の名前を入力してください。", true);
         }
         if (save && kind === "price") value = priceValue(value);
         delete element.dataset.editing;
@@ -1424,6 +1458,92 @@
       });
     }
 
+    function moveSibling(node, direction) {
+      var sibling = direction < 0 ? node.previousElementSibling : node.nextElementSibling;
+      if (!sibling) return;
+      if (direction < 0) node.parentElement.insertBefore(node, sibling);
+      else node.parentElement.insertBefore(sibling, node);
+      markDirty();
+    }
+
+    function enhanceTheme(li) {
+      if (li.dataset.ready === "1") return;
+      li.dataset.ready = "1";
+      bindEdit(li.querySelector(".theme-name"), "theme");
+      var up = button("text-btn move-up", "↑", function () { moveSibling(li, -1); });
+      var down = button("text-btn move-down", "↓", function () { moveSibling(li, 1); });
+      up.title = "上へ";
+      down.title = "下へ";
+      var remove = button("text-btn do-remove", "×", function () {
+        li.remove();
+        markDirty();
+      });
+      remove.title = "このテーマを消す";
+      remove.setAttribute("aria-label", "このテーマを消す");
+      li.append(up, down, remove);
+    }
+
+    function enhanceSeriesArticle(article) {
+      if (article.dataset.ready === "1") return;
+      article.dataset.ready = "1";
+      var tools = el("div", "series-tools");
+      var up = button("text-btn move-up", "↑", function () { moveSibling(article, -1); });
+      var down = button("text-btn move-down", "↓", function () { moveSibling(article, 1); });
+      up.title = "上へ";
+      down.title = "下へ";
+      var remove = button("text-btn do-remove", "×", function () {
+        article.remove();
+        markDirty();
+      });
+      remove.title = "このシリーズを消す";
+      remove.setAttribute("aria-label", "このシリーズを消す");
+      tools.append(up, down, remove);
+      article.insertBefore(tools, article.firstChild);
+      bindEdit(article.querySelector("h3"), "series-title");
+      bindEdit(article.querySelector(".series-lead"), "desc");
+      bindEdit(article.querySelector(".plan-badge"), "desc");
+      bindEdit(article.querySelector(".plan-amount"), "price");
+      bindEdit(article.querySelector(".plan-unit"), "desc");
+      bindEdit(article.querySelector(".plan-single"), "desc");
+      article.querySelectorAll(".themes li").forEach(enhanceTheme);
+      var addTheme = button("text-btn add-theme", "＋ テーマを追加", function () {
+        var li = document.createElement("li");
+        var name = document.createElement("span");
+        name.className = "theme-name";
+        name.textContent = "新しいテーマ";
+        li.appendChild(name);
+        article.querySelector(".themes").appendChild(li);
+        enhanceTheme(li);
+        markDirty();
+      });
+      article.appendChild(addTheme);
+    }
+
+    function enhanceSeries() {
+      var heading = document.getElementById("series");
+      bindEdit(heading, "series-title");
+      var intro = heading && heading.nextElementSibling;
+      if (intro && intro.classList.contains("section-lead")) bindEdit(intro, "desc");
+      document.querySelectorAll(".series article").forEach(enhanceSeriesArticle);
+      var host = document.querySelector(".series");
+      if (!host || document.querySelector(".add-series")) return;
+      var add = button("add-video add-series", "＋ シリーズを追加", function () {
+        var article = MenuKit.seriesArticle({
+          title: "新しいシリーズ",
+          lead: "説明を書く",
+          badge: "2本以上で",
+          price: "15万円",
+          unit: "/本",
+          single: "1本のみ 20万円（税別）",
+          themes: ["テーマ"]
+        });
+        host.appendChild(article);
+        enhanceSeriesArticle(article);
+        markDirty();
+      });
+      host.after(add);
+    }
+
     function start(html, data) {
       var style = (html.match(/<style>([\s\S]*?)<\/style>/) || [])[1] || "";
       var main = (html.match(/<main class="sheet">[\s\S]*?<\/main>/) || [])[0] || "";
@@ -1444,6 +1564,7 @@
       });
       MenuKit.apply(data);
       enhanceAims();
+      enhanceSeries();
       eachMenuRow(function (tr) { enhanceRow(tr); });
       ensureAddButtons();
       savedRaw = rawSnapshot();
