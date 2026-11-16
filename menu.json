@@ -39,6 +39,12 @@
         "label": "参考動画",
         "url": "https://www.youtube.com/watch?v=ALVprGWm7-o"
       }
+    ],
+    "row-1794807835279": [
+      {
+        "label": "Sky株式会社",
+        "url": "https://www.sky-recruit.jp/"
+      }
     ]
   },
   "items": [
@@ -78,7 +84,7 @@
       "name": "HPトップムービー",
       "description": "",
       "duration": "2〜3分",
-      "video": "",
+      "video": "https://www.sky-recruit.jp/",
       "single": "8万円",
       "note": "（一律）"
     }
