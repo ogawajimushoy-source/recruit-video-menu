@@ -57,29 +57,71 @@
     return { text: text, empty: false };
   }
 
+  function markYen(node) {
+    if (!node) return;
+    Array.prototype.forEach.call(node.childNodes, function (child) {
+      if (child.nodeType !== 3 || child.nodeValue.indexOf("万円") === -1) return;
+      var match = child.nodeValue.match(/^(.*?)(万円)(\s*)$/);
+      if (!match) return;
+      child.nodeValue = match[1];
+      var unit = document.createElement("span");
+      unit.className = "yen-unit";
+      unit.textContent = "万円";
+      child.after(unit);
+      if (match[3]) unit.after(document.createTextNode(match[3]));
+    });
+  }
+
+  function decoratePrices() {
+    document.querySelectorAll(".price, .amount, .card-prices strong, .plan-amount").forEach(markYen);
+  }
+
+  function normalizeVideos(value) {
+    var list = [];
+    function push(label, url) {
+      var safe = safeUrl(url);
+      if (!safe) return;
+      list.push({ label: String(label || "").trim() || "参考動画", url: safe });
+    }
+    if (!value) return list;
+    if (typeof value === "string") {
+      push("参考動画", value);
+      return list;
+    }
+    if (!Array.isArray(value)) return list;
+    value.forEach(function (item) {
+      if (typeof item === "string") push("参考動画", item);
+      else if (item) push(item.label, item.url);
+    });
+    return list;
+  }
+
   function isSingle(fields) {
     return !!fields && Object.prototype.hasOwnProperty.call(fields, "single");
   }
 
-  function setVideo(host, url) {
-    var current = host.querySelector("a.sample");
-    if (!url) {
-      if (current) current.remove();
-      return;
-    }
-    if (!current) {
-      current = document.createElement("a");
-      current.className = "sample";
-      current.target = "_blank";
-      current.rel = "noopener noreferrer";
-      current.textContent = "参考動画";
-      var desc = host.querySelector(".desc");
-      var prices = host.querySelector(".card-prices");
-      if (prices) prices.before(current);
-      else if (desc) desc.after(current);
-      else host.appendChild(current);
-    }
-    current.href = url;
+  function setVideos(host, value) {
+    var existing = host.querySelector(".samples");
+    if (existing) existing.remove();
+    host.querySelectorAll("a.sample").forEach(function (node) { node.remove(); });
+    var list = normalizeVideos(value);
+    if (!list.length) return;
+    var wrap = document.createElement("div");
+    wrap.className = "samples";
+    list.forEach(function (item) {
+      var link = document.createElement("a");
+      link.className = "sample";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.href = item.url;
+      link.textContent = item.label;
+      wrap.appendChild(link);
+    });
+    var prices = host.querySelector(".card-prices");
+    var desc = host.querySelector(".desc");
+    if (prices) prices.before(wrap);
+    else if (desc) desc.after(wrap);
+    else host.appendChild(wrap);
   }
 
   function peelNote(value) {
@@ -95,9 +137,11 @@
     cell.textContent = "";
     if (!note || shown.empty) {
       cell.textContent = shown.text;
+      markYen(cell);
       return;
     }
     cell.append(document.createTextNode(shown.text));
+    markYen(cell);
     var unit = document.createElement("span");
     unit.className = "unit";
     unit.textContent = note;
@@ -108,6 +152,7 @@
     var shown = showPrice(value);
     cell.classList.toggle("na", shown.empty);
     cell.textContent = shown.text;
+    markYen(cell);
   }
 
   function priceLine(label, value, note) {
@@ -118,6 +163,7 @@
     var strong = document.createElement("strong");
     if (shown.empty) strong.className = "na";
     strong.textContent = shown.text;
+    markYen(strong);
     if (note && !shown.empty) {
       var unit = document.createElement("span");
       unit.className = "unit";
@@ -200,7 +246,7 @@
     desc.className = "desc";
     desc.textContent = item.description || "";
     heading.append(name, desc);
-    if (url) setVideo(heading, url);
+    if (url) setVideos(heading, url);
     var duration = document.createElement("td");
     duration.className = "duration";
     duration.textContent = item.duration || "";
@@ -242,7 +288,7 @@
     tax.className = "tax-note";
     tax.textContent = "税別";
     card.append(tax);
-    if (url) setVideo(card, url);
+    if (url) setVideos(card, url);
     section.querySelector(".cards").append(card);
   }
 
@@ -286,7 +332,7 @@
       var hasName = !!name && Object.prototype.hasOwnProperty.call(videos, name);
       if (!hasId && !hasName) return;
       var host = node.tagName === "TR" ? node.querySelector("th") : node;
-      setVideo(host, safeUrl(hasId ? videos[id] : videos[name]));
+      setVideos(host, hasId ? videos[id] : videos[name]);
     });
   }
 
@@ -425,6 +471,7 @@
       reorder(section.querySelector(".cards"), order[category]);
     });
     applyVideos(data.videos || {});
+    decoratePrices();
   }
 
   function load() {
@@ -434,7 +481,7 @@
         return response.json();
       })
       .then(apply)
-      .catch(function () {});
+      .catch(function () { decoratePrices(); });
   }
 
   window.MenuKit = {
@@ -443,6 +490,8 @@
     safeUrl: safeUrl,
     yen: yen,
     showPrice: showPrice,
+    markYen: markYen,
+    normalizeVideos: normalizeVideos,
     apply: apply,
     addItem: appendItem,
     seriesArticle: seriesArticle,

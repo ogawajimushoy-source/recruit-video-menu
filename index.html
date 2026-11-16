@@ -255,6 +255,12 @@
       font-weight: 400;
     }
     .desc:empty { display: none; }
+    .samples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      margin-top: 8px;
+    }
     .sample {
       display: inline-block;
       margin-top: 8px;
@@ -263,6 +269,11 @@
       letter-spacing: 0.06em;
       text-underline-offset: 3px;
     }
+    .samples .sample { margin-top: 0; }
+    .yen-unit { font-size: 0.68em; font-weight: 500; letter-spacing: 0; }
+    .plan-main strong .yen-unit,
+    .price .yen-unit,
+    .card-prices strong .yen-unit { font-size: 0.68em; }
     .duration {
       color: #3f3d39;
       font-size: 15px;

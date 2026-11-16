@@ -158,6 +158,20 @@
     #stage .video-slot input { grid-area: input; font-size: 14px; font-weight: 400; }
     #stage .video-slot .sample { grid-area: open; margin-top: 0; white-space: nowrap; }
     #stage .video-slot .sample[hidden] { display: none; }
+    #stage .video-list { margin-top: 8px; }
+    #stage .video-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    #stage .video-name,
+    #stage .video-row .video-input { grid-column: 1; }
+    #stage .video-row .sample { grid-column: 2; grid-row: 2; margin-top: 0; }
+    #stage .video-row .do-remove { grid-column: 2; grid-row: 1; justify-self: end; }
+    #stage .video-name { font-size: 14px; font-weight: 500; }
+    #stage .add-sample { margin-top: 6px; }
     #stage .name-input { display: block; font-size: 17px; font-weight: 700; }
     #stage .desc-input { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; font-weight: 400; }
     #stage .duration-input { font-size: 15px; }
@@ -336,7 +350,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=10"></script>
+  <script src="menu.js?v=11"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -493,6 +507,76 @@
       syncLink();
       wrap.append(label, input, open);
       return wrap;
+    }
+
+    function readVideoRows(root) {
+      var list = [];
+      root.querySelectorAll(".video-row").forEach(function (row) {
+        var url = MenuKit.safeUrl((row.querySelector(".video-input") || {}).value || "");
+        if (!url) return;
+        var label = ((row.querySelector(".video-name") || {}).value || "").trim() || "参考動画";
+        list.push({ label: label, url: url });
+      });
+      return list;
+    }
+
+    function videoEditor(initial, onChange) {
+      var box = el("div", "video-list");
+      var rows = el("div", "video-rows");
+      function emit() {
+        if (onChange) onChange(readVideoRows(rows));
+      }
+      function addRow(item) {
+        var row = el("div", "video-row");
+        var name = el("input", "video-name");
+        name.type = "text";
+        name.placeholder = "表示名";
+        name.value = item && item.label ? item.label : "参考動画";
+        name.setAttribute("aria-label", "参考動画の表示名");
+        var input = el("input", "video-input");
+        input.type = "url";
+        input.placeholder = "URLを貼る";
+        input.spellcheck = false;
+        input.autocomplete = "off";
+        input.setAttribute("aria-label", "参考動画のURL");
+        input.value = item && item.url ? item.url : "";
+        var open = el("a", "sample", "開く");
+        open.target = "_blank";
+        open.rel = "noopener noreferrer";
+        function syncLink() {
+          var url = MenuKit.safeUrl(input.value);
+          open.hidden = !url;
+          if (url) open.href = url;
+        }
+        input.addEventListener("input", function () {
+          input.classList.remove("bad");
+          syncLink();
+          emit();
+        });
+        input.addEventListener("blur", function () {
+          input.classList.toggle("bad", !!(input.value.trim() && !MenuKit.safeUrl(input.value)));
+        });
+        name.addEventListener("input", emit);
+        var remove = button("text-btn do-remove", "×", function () {
+          row.remove();
+          if (!rows.children.length) addRow({ label: "参考動画", url: "" });
+          emit();
+        });
+        remove.title = "この参考動画を消す";
+        remove.setAttribute("aria-label", "この参考動画を消す");
+        syncLink();
+        row.append(name, remove, input, open);
+        rows.append(row);
+      }
+      var list = MenuKit.normalizeVideos(initial);
+      if (!list.length) list = [{ label: "参考動画", url: "" }];
+      list.forEach(addRow);
+      var add = button("text-btn add-sample", "＋ 参考動画", function () {
+        addRow({ label: "参考動画", url: "" });
+        emit();
+      });
+      box.append(rows, add);
+      return box;
     }
 
     function textInput(className, value, placeholder, label) {
@@ -809,12 +893,12 @@
       eachMenuRow(function (tr) {
         if (message) return;
         var fields = readRow(tr);
-        var video = (tr.querySelector(".video-input") || {}).value || "";
-        video = video.trim();
         if (!fields.name) message = "動画の名前を入力してください。";
         else if (names.indexOf(fields.name) !== -1) message = "同じ名前の動画がすでにあります。";
         else if (!fields.duration) message = fields.name + "の尺を入力してください。";
-        else if (video && !MenuKit.safeUrl(video)) message = fields.name + "の参考動画は https で始まるURLにしてください。";
+        else if (tr.querySelector(".video-input.bad, .video-row .video-input") && Array.prototype.some.call(tr.querySelectorAll(".video-input"), function (input) {
+          return input.value.trim() && !MenuKit.safeUrl(input.value);
+        })) message = fields.name + "の参考動画は https で始まるURLにしてください。";
         else names.push(fields.name);
       });
       return message;
@@ -1051,6 +1135,7 @@
       var amountEl = document.createElement("span");
       amountEl.className = shown.empty ? "amount na" : "amount";
       amountEl.textContent = shown.text;
+      MenuKit.markYen(amountEl);
       var unit = document.createElement("span");
       unit.className = "unit";
       unit.textContent = note || "（一律）";
@@ -1065,6 +1150,7 @@
       fresh.className = "price";
       var shown = MenuKit.showPrice(amount);
       fresh.textContent = shown.text;
+      MenuKit.markYen(fresh);
       fresh.classList.toggle("na", shown.empty);
       var second = document.createElement("td");
       second.className = "price na";
@@ -1152,8 +1238,7 @@
         var id = tr.dataset.id;
         payload.order[category].push(id);
         var fields = readRow(tr);
-        var video = (tr.querySelector(".video-input") || {}).value || "";
-        video = video.trim();
+        var videos = readVideoRows(tr);
         if (fields.single != null) {
           fields.single = priceValue(fields.single);
           if (fields.single === "対象外") delete fields.note;
@@ -1169,7 +1254,7 @@
             name: fields.name,
             description: fields.description,
             duration: fields.duration,
-            video: MenuKit.safeUrl(video)
+            video: videos[0] ? videos[0].url : ""
           };
           if (fields.single != null) {
             item.single = fields.single === "対象外" ? "" : fields.single;
@@ -1181,8 +1266,9 @@
           payload.items.push(item);
         } else {
           payload.overrides[id] = fields;
-          if (video || tracked[id]) payload.videos[id] = MenuKit.safeUrl(video);
+          if (videos.length || tracked[id]) payload.videos[id] = videos;
         }
+        if (videos.length || tracked[id]) payload.videos[id] = videos;
       });
       return payload;
     }
@@ -1252,6 +1338,7 @@
         delete element.dataset.editing;
         if (kind === "price") element.classList.toggle("na", value === "対象外");
         element.textContent = value;
+        if (kind === "price") MenuKit.markYen(element);
         var tr = element.closest("tr");
         if (tr && save) syncCard(tr);
         if (save) markDirty();
@@ -1305,6 +1392,7 @@
         var strong = document.createElement("strong");
         if (shown.empty) strong.className = "na";
         strong.textContent = shown.text;
+        MenuKit.markYen(strong);
         if (note && !shown.empty) {
           var unit = document.createElement("span");
           unit.className = "unit";
@@ -1390,15 +1478,19 @@
         }
         bindEdit(amount || child, "price");
       });
-      var link = th.querySelector("a.sample");
-      var initial = "";
-      if (Object.prototype.hasOwnProperty.call(state.videos, tr.dataset.id)) initial = state.videos[tr.dataset.id] || "";
-      else if (link) initial = link.href;
-      if (initial) tracked[tr.dataset.id] = true;
-      if (link) link.remove();
-      th.append(videoSlot(initial, function (value) {
-        state.videos[tr.dataset.id] = value;
-        if (value) tracked[tr.dataset.id] = true;
+      var initial = [];
+      if (Object.prototype.hasOwnProperty.call(state.videos, tr.dataset.id)) initial = state.videos[tr.dataset.id];
+      else {
+        th.querySelectorAll("a.sample").forEach(function (link) {
+          var url = MenuKit.safeUrl(link.href);
+          if (url) initial.push({ label: link.textContent.trim() || "参考動画", url: url });
+        });
+      }
+      if (MenuKit.normalizeVideos(initial).length) tracked[tr.dataset.id] = true;
+      th.querySelectorAll("a.sample, .samples").forEach(function (node) { node.remove(); });
+      th.append(videoEditor(initial, function (list) {
+        state.videos[tr.dataset.id] = list;
+        tracked[tr.dataset.id] = true;
         markDirty();
       }));
       grip.addEventListener("dragstart", function (event) {
