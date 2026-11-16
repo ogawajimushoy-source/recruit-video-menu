@@ -1,5 +1,11 @@
 {
   "videos": {
+    "事業計画": [
+      {
+        "label": "ASVレポート2024",
+        "url": "https://www.youtube.com/watch?v=D1mfMK4ESdc&list=PLV5Mh5pcHKycSmWlhmMlGmfmX5AH_aUPo&index=4"
+      }
+    ],
     "社員紹介（1名）": [
       {
         "label": "C.Aさん",
@@ -65,6 +71,16 @@
       "video": "",
       "interview": "-",
       "workplace": "45万円"
+    },
+    {
+      "id": "row-1794807835279",
+      "category": "company",
+      "name": "HPトップ動画",
+      "description": "",
+      "duration": "2〜3分",
+      "video": "",
+      "interview": "",
+      "workplace": ""
     }
   ],
   "order": {
@@ -85,7 +101,8 @@
       "row-1794462538667",
       "row-1794529192476",
       "福利厚生紹介",
-      "ルームツアー"
+      "ルームツアー",
+      "row-1794807835279"
     ]
   },
   "overrides": {
