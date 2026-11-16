@@ -1,7 +1,27 @@
 {
   "videos": {
-    "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM",
-    "ルームツアー": "https://www.youtube.com/watch?v=ALVprGWm7-o"
+    "社員紹介（1名）": [
+      {
+        "label": "C.Aさん",
+        "url": "https://www.youtube.com/watch?v=vQmKygPI9WM"
+      },
+      {
+        "label": "K.Tさん",
+        "url": "https://www.youtube.com/watch?v=WTU3Rb7_x5g"
+      }
+    ],
+    "row-1794462275393": [
+      {
+        "label": "御堂筋税理士法人",
+        "url": "https://www.youtube.com/watch?v=vQmKygPI9WM"
+      }
+    ],
+    "ルームツアー": [
+      {
+        "label": "参考動画",
+        "url": "https://www.youtube.com/watch?v=ALVprGWm7-o"
+      }
+    ]
   },
   "items": [
     {
@@ -186,5 +206,15 @@
         "仕事の大変なところ"
       ]
     }
+  ],
+  "notesIntro": {
+    "title": "追加料金・注意事項",
+    "lead": "表示価格は税別です。金額は、表にある尺・人数と、インサートなしか、インサートありかの範囲です。次のものは別途です。"
+  },
+  "notes": [
+    "この範囲を超える撮影",
+    "遠方の交通・宿泊",
+    "ナレーション手配",
+    "納品後の大幅な作り直し"
   ]
 }
