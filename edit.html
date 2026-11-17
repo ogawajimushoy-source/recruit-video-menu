@@ -274,8 +274,15 @@
     #stage .series-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
     #stage .themes li { align-items: center; }
     #stage .theme-name { flex: 1; min-width: 0; }
-    #stage .add-theme, #stage .add-note { margin-top: 12px; }
-    #stage .notes .text-btn { margin-left: 8px; }
+    #stage .add-theme, #stage .add-note, #stage .add-condition { margin-top: 12px; }
+    #stage .notes .text-btn, #stage .conditions .text-btn { margin-left: 8px; }
+    #stage textarea.inline-edit {
+      display: block;
+      width: 100%;
+      min-height: 4.8em;
+      resize: vertical;
+      line-height: 1.5;
+    }
     #stage .grip { cursor: grab; color: var(--muted); font-size: 13px; }
     #stage tr.drop-target { outline: 2px solid var(--green); outline-offset: -2px; }
     @media (max-width: 700px) {
@@ -350,7 +357,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=11"></script>
+  <script src="menu.js?v=13"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -450,7 +457,7 @@
       if (item.single) {
         if (!isPrice(item.single)) return "料金を入力してください。";
       } else if (!isPrice(item.interview) && !isPrice(item.workplace)) {
-        return "料金をどちらか入力してください。空欄は対象外になります。";
+        return "料金をどちらか入力してください。空欄は提供対象外になります。";
       }
       return "";
     }
@@ -655,7 +662,7 @@
         [item.workplace || "", "インサートあり"]
       ].forEach(function (pair) {
         var cell = el("td", "price");
-        var price = textInput("price-input", pair[0], "対象外", pair[1]);
+        var price = textInput("price-input", pair[0], "提供対象外", pair[1]);
         price.inputMode = "numeric";
         cell.append(price);
         tr.append(cell);
@@ -1112,7 +1119,7 @@
     }
 
     function cellAmount(cell) {
-      var amount = cell.querySelector(".amount");
+      var amount = cell.querySelector(".amount, .status");
       if (amount) return amount.textContent.trim();
       var unit = cell.querySelector(".unit");
       var text = cell.textContent;
@@ -1127,13 +1134,27 @@
       return match ? match[0] : "";
     }
 
+    function statusMark(shown) {
+      var mark = document.createElement("span");
+      mark.className = shown.kind === "quote" ? "status status-quote" : "status status-off";
+      mark.textContent = shown.text;
+      return mark;
+    }
+
     function paintSingle(cell, amount, note) {
       var fresh = document.createElement("td");
       fresh.className = "price";
       fresh.colSpan = 2;
       var shown = MenuKit.showPrice(amount);
+      if (shown.kind !== "price") {
+        fresh.classList.add(shown.kind === "quote" ? "is-quote" : "na");
+        fresh.append(statusMark(shown));
+        cell.replaceWith(fresh);
+        bindEdit(fresh, "price");
+        return fresh;
+      }
       var amountEl = document.createElement("span");
-      amountEl.className = shown.empty ? "amount na" : "amount";
+      amountEl.className = "amount";
       amountEl.textContent = shown.text;
       MenuKit.markYen(amountEl);
       var unit = document.createElement("span");
@@ -1149,12 +1170,16 @@
       var fresh = document.createElement("td");
       fresh.className = "price";
       var shown = MenuKit.showPrice(amount);
-      fresh.textContent = shown.text;
-      MenuKit.markYen(fresh);
-      fresh.classList.toggle("na", shown.empty);
+      if (shown.kind === "price") {
+        fresh.textContent = shown.text;
+        MenuKit.markYen(fresh);
+      } else {
+        fresh.classList.add(shown.kind === "quote" ? "is-quote" : "na");
+        fresh.append(statusMark(shown));
+      }
       var second = document.createElement("td");
       second.className = "price na";
-      second.textContent = "対象外";
+      second.append(statusMark({ kind: "off", text: "提供対象外" }));
       cell.replaceWith(fresh);
       fresh.after(second);
       bindEdit(fresh, "price");
@@ -1179,7 +1204,7 @@
     }
 
     function priceValue(text) {
-      return MenuKit.yen(text === "対象外" ? "" : text) || "対象外";
+      return MenuKit.showPrice(text).text;
     }
 
     function collect() {
@@ -1197,6 +1222,22 @@
         title: seriesHeading ? seriesHeading.textContent.trim() : "",
         lead: seriesLead && seriesLead.classList.contains("section-lead") ? seriesLead.textContent.trim() : ""
       };
+      var pageTitle = document.getElementById("page-title");
+      var pageLead = document.querySelector("p.lead");
+      var pageCompany = document.querySelector("p.company");
+      payload.page = {
+        company: pageCompany ? pageCompany.textContent.trim() : "",
+        kicker: document.querySelector(".kicker") ? document.querySelector(".kicker").textContent.trim() : "",
+        title: pageTitle ? pageTitle.textContent.trim() : "",
+        promise: document.querySelector(".promise") ? document.querySelector(".promise").textContent.trim() : "",
+        lead: pageLead ? pageLead.textContent.trim() : ""
+      };
+      var menuHeading = document.getElementById("single");
+      var menuLead = menuHeading && menuHeading.nextElementSibling;
+      payload.menuIntro = {
+        title: menuHeading ? menuHeading.textContent.trim() : "",
+        lead: menuLead && menuLead.classList.contains("section-lead") ? menuLead.textContent.trim() : ""
+      };
       payload.series = [];
       document.querySelectorAll(".series article").forEach(function (article) {
         var themes = [];
@@ -1211,6 +1252,7 @@
           price: (article.querySelector(".plan-amount") || {}).textContent ? article.querySelector(".plan-amount").textContent.trim() : "",
           unit: (article.querySelector(".plan-unit") || {}).textContent ? article.querySelector(".plan-unit").textContent.trim() : "",
           single: (article.querySelector(".plan-single") || {}).textContent ? article.querySelector(".plan-single").textContent.trim() : "",
+          insert: article.querySelector(".plan-insert") ? article.querySelector(".plan-insert").textContent.trim() : "",
           themes: themes
         });
       });
@@ -1224,6 +1266,17 @@
       document.querySelectorAll(".notes .note-name").forEach(function (node) {
         var text = node.textContent.trim();
         if (text) payload.notes.push(text);
+      });
+      var conditionsHeading = document.getElementById("conditions");
+      var conditionsLead = conditionsHeading && conditionsHeading.nextElementSibling;
+      payload.conditionsIntro = {
+        title: conditionsHeading ? conditionsHeading.textContent.trim() : "",
+        lead: conditionsLead && conditionsLead.classList.contains("section-lead") ? conditionsLead.textContent.trim() : ""
+      };
+      payload.conditions = [];
+      document.querySelectorAll(".conditions .condition-name").forEach(function (node) {
+        var text = node.textContent.trim();
+        if (text) payload.conditions.push(text);
       });
       document.querySelectorAll(".aims a").forEach(function (link) {
         var id = (link.getAttribute("href") || "").replace("#", "");
@@ -1241,7 +1294,7 @@
         var videos = readVideoRows(tr);
         if (fields.single != null) {
           fields.single = priceValue(fields.single);
-          if (fields.single === "対象外") delete fields.note;
+          if (MenuKit.showPrice(fields.single).kind !== "price") delete fields.note;
           else if (!fields.note) fields.note = "（一律）";
         } else {
           fields.interview = priceValue(fields.interview);
@@ -1257,11 +1310,11 @@
             video: videos[0] ? videos[0].url : ""
           };
           if (fields.single != null) {
-            item.single = fields.single === "対象外" ? "" : fields.single;
-            if (fields.note && item.single) item.note = fields.note;
+            item.single = fields.single;
+            if (fields.note) item.note = fields.note;
           } else {
-            item.interview = fields.interview === "対象外" ? "" : fields.interview;
-            item.workplace = fields.workplace === "対象外" ? "" : fields.workplace;
+            item.interview = fields.interview;
+            item.workplace = fields.workplace;
           }
           payload.items.push(item);
         } else {
@@ -1301,12 +1354,13 @@
       if (!element || element.dataset.editing === "1") return;
       var original = element.textContent.trim();
       element.dataset.editing = "1";
-      var input = document.createElement("input");
-      input.type = "text";
+      var multiline = kind === "desc" || kind === "note";
+      var input = document.createElement(multiline ? "textarea" : "input");
       input.className = "inline-edit";
-      input.value = kind === "price" && original === "対象外" ? "" : original;
+      if (!multiline) input.type = "text";
+      input.value = kind === "price" && MenuKit.showPrice(original).kind === "off" ? "" : original;
       if (kind === "price") input.placeholder = "20万円、応相談など";
-      if (kind === "desc") input.placeholder = "説明";
+      if (kind === "desc" || kind === "note") input.placeholder = "文章";
       if (kind === "name") input.placeholder = "動画の名前";
       if (kind === "duration") input.placeholder = "2〜3分";
       element.textContent = "";
@@ -1326,19 +1380,31 @@
           markDirty();
           return;
         }
-        if (save && (kind === "name" || kind === "aim" || kind === "series-title" || kind === "note-title") && !value) {
+        if (save && (kind === "name" || kind === "aim" || kind === "series-title" || kind === "note-title" || kind === "page-title") && !value) {
           value = original;
           var emptyMessage = "動画の名前を入力してください。";
           if (kind === "series-title") emptyMessage = "シリーズの名前を空にはできません。";
-          if (kind === "note-title") emptyMessage = "見出しを空にはできません。";
+          if (kind === "note-title" || kind === "page-title") emptyMessage = "この文章を空にはできません。";
           if (kind === "aim") emptyMessage = "カードの文字を空にはできません。";
           setStatus(emptyMessage, true);
         }
         if (save && kind === "price") value = priceValue(value);
         delete element.dataset.editing;
-        if (kind === "price") element.classList.toggle("na", value === "対象外");
-        element.textContent = value;
-        if (kind === "price") MenuKit.markYen(element);
+        var shownPrice = kind === "price" ? MenuKit.showPrice(value) : null;
+        element.classList.remove("na", "is-quote");
+        element.textContent = "";
+        if (!shownPrice || shownPrice.kind === "price") {
+          element.textContent = value;
+          if (shownPrice) MenuKit.markYen(element);
+        } else {
+          element.classList.add(shownPrice.kind === "quote" ? "is-quote" : "na");
+          element.appendChild(statusMark(shownPrice));
+        }
+        if (element.classList.contains("company")) {
+          document.querySelectorAll(".company").forEach(function (node) {
+            if (node !== element) node.textContent = element.textContent;
+          });
+        }
         var tr = element.closest("tr");
         if (tr && save) syncCard(tr);
         if (save) markDirty();
@@ -1390,10 +1456,15 @@
         span.textContent = label;
         var shown = MenuKit.showPrice(value);
         var strong = document.createElement("strong");
-        if (shown.empty) strong.className = "na";
-        strong.textContent = shown.text;
-        MenuKit.markYen(strong);
-        if (note && !shown.empty) {
+        if (shown.kind === "off") strong.className = "na";
+        if (shown.kind === "quote") strong.className = "is-quote";
+        if (shown.kind === "price") {
+          strong.textContent = shown.text;
+          MenuKit.markYen(strong);
+        } else {
+          strong.appendChild(statusMark(shown));
+        }
+        if (note && shown.kind === "price") {
           var unit = document.createElement("span");
           unit.className = "unit";
           unit.textContent = note;
@@ -1439,7 +1510,7 @@
           paintSplit(cells[0], cellAmount(cells[0]));
         } else {
           var amount = cellAmount(cells[0]);
-          if (!amount || amount === "対象外") amount = cellAmount(cells[1]);
+          if (MenuKit.showPrice(amount).kind !== "price") amount = cellAmount(cells[1]);
           cells[1].remove();
           paintSingle(cells[0], amount, "（一律）");
         }
@@ -1613,6 +1684,7 @@
       bindEdit(article.querySelector(".plan-amount"), "price");
       bindEdit(article.querySelector(".plan-unit"), "desc");
       bindEdit(article.querySelector(".plan-single"), "desc");
+      bindEdit(article.querySelector(".plan-insert"), "desc");
       article.querySelectorAll(".themes li").forEach(enhanceTheme);
       var addTheme = button("text-btn add-theme", "＋ テーマを追加", function () {
         var li = document.createElement("li");
@@ -1642,7 +1714,7 @@
           badge: "2本以上で",
           price: "15万円",
           unit: "/本",
-          single: "1本のみ 20万円（税別）",
+          single: "1本のみ 20万円／本",
           themes: ["テーマ"]
         });
         host.appendChild(article);
@@ -1669,6 +1741,23 @@
       li.append(up, down, remove);
     }
 
+    function enhancePage() {
+      bindEdit(document.querySelector("p.company"), "page-title");
+      bindEdit(document.querySelector(".kicker"), "desc");
+      bindEdit(document.getElementById("page-title"), "page-title");
+      bindEdit(document.querySelector(".promise"), "desc");
+      bindEdit(document.querySelector("p.lead"), "desc");
+      var footCompany = document.querySelector(".foot .company");
+      if (footCompany) bindEdit(footCompany, "page-title");
+    }
+
+    function enhanceMenuIntro() {
+      var heading = document.getElementById("single");
+      bindEdit(heading, "note-title");
+      var intro = heading && heading.nextElementSibling;
+      if (intro && intro.classList.contains("section-lead")) bindEdit(intro, "desc");
+    }
+
     function enhanceNotes() {
       var heading = document.getElementById("notes");
       bindEdit(heading, "note-title");
@@ -1685,6 +1774,44 @@
         li.appendChild(name);
         host.appendChild(li);
         enhanceNote(li);
+        markDirty();
+      });
+      host.after(add);
+    }
+
+    function enhanceCondition(li) {
+      if (li.dataset.ready === "1") return;
+      li.dataset.ready = "1";
+      bindEdit(li.querySelector(".condition-name"), "note");
+      var up = button("text-btn move-up", "↑", function () { moveSibling(li, -1); });
+      var down = button("text-btn move-down", "↓", function () { moveSibling(li, 1); });
+      up.title = "上へ";
+      down.title = "下へ";
+      var remove = button("text-btn do-remove", "×", function () {
+        li.remove();
+        markDirty();
+      });
+      remove.title = "この項目を消す";
+      remove.setAttribute("aria-label", "この項目を消す");
+      li.append(up, down, remove);
+    }
+
+    function enhanceConditions() {
+      var heading = document.getElementById("conditions");
+      bindEdit(heading, "note-title");
+      var intro = heading && heading.nextElementSibling;
+      if (intro && intro.classList.contains("section-lead")) bindEdit(intro, "desc");
+      document.querySelectorAll(".conditions li").forEach(enhanceCondition);
+      var host = document.querySelector("ul.conditions");
+      if (!host || document.querySelector(".add-condition")) return;
+      var add = button("text-btn add-condition", "＋ 項目を追加", function () {
+        var li = document.createElement("li");
+        var name = document.createElement("span");
+        name.className = "condition-name";
+        name.textContent = "新しい項目";
+        li.appendChild(name);
+        host.appendChild(li);
+        enhanceCondition(li);
         markDirty();
       });
       host.after(add);
@@ -1709,9 +1836,12 @@
         state.videos[name] = data.videos[name] || "";
       });
       MenuKit.apply(data);
+      enhancePage();
+      enhanceMenuIntro();
       enhanceAims();
       enhanceSeries();
       enhanceNotes();
+      enhanceConditions();
       eachMenuRow(function (tr) { enhanceRow(tr); });
       ensureAddButtons();
       savedRaw = rawSnapshot();

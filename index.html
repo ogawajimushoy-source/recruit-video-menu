@@ -298,10 +298,30 @@
       font-weight: 500;
     }
     .na {
-      color: var(--muted);
-      font-size: 14px;
+      color: #8a847c;
+      font-size: 13px;
       font-weight: 500;
     }
+    .status {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .status-off {
+      padding: 2px 0;
+      color: #8a847c;
+      font-weight: 500;
+    }
+    .status-quote {
+      padding: 2px 8px;
+      background: var(--pill);
+      color: var(--green-deep);
+    }
+    td.price.is-quote { text-align: center; }
     .cards { display: none; }
     .card {
       margin: 0 0 12px;
@@ -340,7 +360,8 @@
       font-weight: 700;
       white-space: nowrap;
     }
-    .card-prices .na { font-size: 14px; }
+    .card-prices .na { font-size: 13px; }
+    .card-prices .status { font-size: 12px; }
     .card .tax-note {
       margin: 8px 0 0;
       color: var(--muted);
@@ -435,6 +456,15 @@
       text-align: right;
       white-space: nowrap;
     }
+    .plan-insert {
+      margin: 0;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .plan-insert:empty { display: none; }
     .themes {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -466,8 +496,8 @@
       line-height: 18px;
       text-align: center;
     }
-    .notes { margin: 14px 0 0; padding: 0; }
-    .notes li { margin: 0 0 6px; }
+    .notes, .conditions { margin: 14px 0 0; padding: 0; }
+    .notes li, .conditions li { margin: 0 0 8px; }
     .foot {
       display: flex;
       justify-content: flex-end;
@@ -487,6 +517,7 @@
       .aims, .choices, .themes { grid-template-columns: 1fr; }
       .series-head { align-items: flex-start; }
       .plan { align-items: flex-start; margin-left: 0; }
+      .plan-single, .plan-insert { text-align: left; white-space: normal; }
       .plan-main strong { font-size: 28px; }
       .plan-main strong .plan-amount { font-size: inherit; }
       .table-wrap { display: none; }
@@ -501,7 +532,7 @@
   <main class="sheet">
     <p class="company">株式会社ファディー</p>
     <p class="kicker">RECRUIT VIDEO PRODUCTION</p>
-    <h1>採用動画 料金プラン</h1>
+    <h1 id="page-title">採用動画 料金プラン</h1>
     <p class="promise">会社の魅力を、伝わる映像に。</p>
     <p class="lead">企業の想いや働く人の姿、仕事の魅力を伝える採用動画をご提案します。</p>
     <ul class="aims">
@@ -523,20 +554,18 @@
         <a href="#company">
           <span>会社・仕事</span>
           <strong>会社の雰囲気や仕事内容を伝えたい</strong>
-          <em>会社紹介、事業内容紹介、福利厚生紹介、ルームツアー</em>
+          <em>会社紹介、事業内容紹介、福利厚生紹介、オフィスツアー</em>
         </a>
       </li>
     </ul>
 
     <hr class="rule">
 
-    <h2>単品メニュー</h2>
+    <h2 id="single">単品メニュー</h2>
+    <p class="section-lead">インサートなしは、インタビュー撮影のみです。オフィスや仕事風景などの追加撮影は行いません。インサートありは、インタビューに加えて、オフィスや仕事風景などを追加撮影して差し込みます。</p>
 
     <section class="menu-block" id="representative">
-      <div class="block-head">
-        <h3>01　代表</h3>
-        <p>インサート：オフィスや仕事風景の映像を差し込む追加撮影</p>
-      </div>
+      <h3>01　代表</h3>
       <div class="table-wrap">
         <table>
           <colgroup>
@@ -578,7 +607,7 @@
               </th>
               <td class="duration">8〜15分</td>
               <td class="price">35万円</td>
-              <td class="price na">対象外</td>
+              <td class="price na"><span class="status status-off">提供対象外</span></td>
             </tr>
           </tbody>
         </table>
@@ -610,7 +639,7 @@
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
             <p><span>インサートなし</span><strong>35万円</strong></p>
-            <p><span>インサートあり</span><strong class="na">対象外</strong></p>
+            <p><span>インサートあり</span><strong class="na"><span class="status status-off">提供対象外</span></strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -652,7 +681,7 @@
               </th>
               <td class="duration">8〜15分</td>
               <td class="price">35万円</td>
-              <td class="price na">対象外</td>
+              <td class="price na"><span class="status status-off">提供対象外</span></td>
             </tr>
             <tr>
               <th scope="row">
@@ -702,7 +731,7 @@
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
             <p><span>インサートなし</span><strong>35万円</strong></p>
-            <p><span>インサートあり</span><strong class="na">対象外</strong></p>
+            <p><span>インサートあり</span><strong class="na"><span class="status status-off">提供対象外</span></strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -763,7 +792,8 @@
                 <span class="desc">会社の全体像をひと目で</span>
               </th>
               <td class="duration">3〜5分</td>
-              <td class="price" colspan="2">45万円<span class="unit">（インサート込み）</span></td>
+              <td class="price na"><span class="status status-off">提供対象外</span></td>
+              <td class="price">45万円</td>
             </tr>
             <tr>
               <th scope="row">
@@ -771,7 +801,8 @@
                 <span class="desc">仕事の中身とビジネスモデル</span>
               </th>
               <td class="duration">3〜5分</td>
-              <td class="price" colspan="2">45万円<span class="unit">（インサート込み）</span></td>
+              <td class="price na"><span class="status status-off">提供対象外</span></td>
+              <td class="price">45万円</td>
             </tr>
             <tr>
               <th scope="row">
@@ -799,7 +830,8 @@
           <p class="desc">会社の全体像をひと目で</p>
           <p class="meta">動画の尺：3〜5分</p>
           <div class="card-prices">
-            <p><span>料金</span><strong>45万円<span class="unit">（インサート込み）</span></strong></p>
+            <p><span>インサートなし</span><strong class="na"><span class="status status-off">提供対象外</span></strong></p>
+            <p><span>インサートあり</span><strong>45万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -808,7 +840,8 @@
           <p class="desc">仕事の中身とビジネスモデル</p>
           <p class="meta">動画の尺：3〜5分</p>
           <div class="card-prices">
-            <p><span>料金</span><strong>45万円<span class="unit">（インサート込み）</span></strong></p>
+            <p><span>インサートなし</span><strong class="na"><span class="status status-off">提供対象外</span></strong></p>
+            <p><span>インサートあり</span><strong>45万円</strong></p>
           </div>
           <p class="tax-note">税別</p>
         </article>
@@ -837,7 +870,7 @@
     <hr class="rule">
 
     <h2 id="series">シリーズ</h2>
-    <p class="section-lead">1テーマ1本・各2〜3分。好きなテーマを組み合わせて制作できます。</p>
+    <p class="section-lead">1テーマ1本・各2〜3分。代表のシリーズと社員のシリーズは別々に本数を数えます。2本以上は、同一案件なら撮影日が別でも15万円／本です。3本以上も同じです。単品メニューは本数に含みません。掲載テーマ以外も、採用動画に関する内容であれば相談のうえ対応します。</p>
     <div class="series">
       <article>
         <div class="series-head">
@@ -846,8 +879,9 @@
             <p class="series-lead">代表の想いを、テーマごとに深く</p>
           </div>
           <div class="plan">
-            <p class="plan-main"><span class="plan-badge">2本以上で</span><strong><span class="plan-amount">15万円</span><span class="plan-unit">/本</span></strong></p>
-            <p class="plan-single">1本のみ 20万円（税別）</p>
+            <p class="plan-main"><span class="plan-badge">2本以上で</span><strong><span class="plan-amount">15万円</span><span class="plan-unit">／本</span></strong></p>
+            <p class="plan-single">1本のみ 20万円／本</p>
+            <p class="plan-insert">インサート撮影込み</p>
           </div>
         </div>
         <hr class="series-line">
@@ -868,8 +902,9 @@
             <p class="series-lead">現場のリアルな声を、テーマごとに</p>
           </div>
           <div class="plan">
-            <p class="plan-main"><span class="plan-badge">2本以上で</span><strong><span class="plan-amount">15万円</span><span class="plan-unit">/本</span></strong></p>
-            <p class="plan-single">1本のみ 20万円（税別）</p>
+            <p class="plan-main"><span class="plan-badge">2本以上で</span><strong><span class="plan-amount">15万円</span><span class="plan-unit">／本</span></strong></p>
+            <p class="plan-single">1本のみ 20万円／本</p>
+            <p class="plan-insert">インサート撮影込み</p>
           </div>
         </div>
         <hr class="series-line">
@@ -885,16 +920,33 @@
 
     <hr class="rule">
 
-    <h2 id="notes">追加料金・注意事項</h2>
-    <p class="section-lead">表示価格は税別です。金額は、表にある尺・人数と、インサートなしか、インサートありかの範囲です。次のものは別途です。</p>
+    <h2 id="notes">注意事項</h2>
     <ul class="notes">
-      <li><span class="note-name">この範囲を超える撮影</span></li>
-      <li><span class="note-name">遠方の交通・宿泊</span></li>
-      <li><span class="note-name">ナレーション手配</span></li>
-      <li><span class="note-name">納品後の大幅な作り直し</span></li>
+      <li><span class="note-name">表示価格は税別です。</span></li>
+      <li><span class="note-name">スタジオ使用料込みです。</span></li>
+      <li><span class="note-name">県外撮影は、交通費・宿泊費が別途です。</span></li>
+      <li><span class="note-name">シリーズ料金には、仕事風景などのインサート撮影を含みます。撮影範囲は案件ごとに事前確認します。</span></li>
+      <li><span class="note-name">完成イメージや構成を根本から変更する場合は、別途費用です。</span></li>
+      <li><span class="note-name">悪天候による撮影延期は無料です。スタジオなど外部のキャンセル実費は別途です。</span></li>
+      <li><span class="note-name">お客様都合による撮影日の変更は、原則1回まで無料です。</span></li>
+    </ul>
+
+    <hr class="rule">
+
+    <h2 id="conditions">料金・制作条件</h2>
+    <ul class="conditions">
+      <li><span class="condition-name">愛知県内は基本料金に含みます。県外は交通費・宿泊費の実費が別途で、県外による撮影料金の割増はありません。</span></li>
+      <li><span class="condition-name">交通費は、高速代・駐車場代・公共交通機関などの実費です。宿泊が必要なときは、交通費とまとめて見積もります。</span></li>
+      <li><span class="condition-name">スタジオ使用料は、金額にかかわらず基本料金に含みます。</span></li>
+      <li><span class="condition-name">同じ敷地・建物内なら、複数の場所で撮影できます。別拠点は、移動距離と撮影内容により個別見積もりです。</span></li>
+      <li><span class="condition-name">照明機材の使用と設営は、基本料金に含みます。</span></li>
+      <li><span class="condition-name">1人で話すインタビューは、基本2カメです。</span></li>
+      <li><span class="condition-name">基本編集は、カット・色味調整・音声調整・BGM・基本テロップです。テロップは、基本的に話している内容を全編に表示します。</span></li>
+      <li><span class="condition-name">納品は、MP4・フルHD（1920×1080）・横型16:9です。撮影素材は納品せず、完成動画のみです。</span></li>
+      <li><span class="condition-name">オフィスツアー（25万円・一律）は、オフィスや仕事風景の撮影を含みます。インサートの有無では料金を分けません。</span></li>
     </ul>
     <div class="foot">
-      <p>株式会社ファディー</p>
+      <p class="company">株式会社ファディー</p>
     </div>
   </main>
   <script>

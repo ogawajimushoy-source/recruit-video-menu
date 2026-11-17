@@ -45,16 +45,38 @@
     var text = String(value || "").replace(/[０-９]/g, function (ch) {
       return String.fromCharCode(ch.charCodeAt(0) - 65248);
     }).trim();
-    if (!text || text === "対象外") return "";
+    if (!text || text === "対象外" || text === "提供対象外" || text === "対応対象外") return "";
     if (/^\d+(?:\.\d+)?$/.test(text)) return text + "万円";
     if (/^\d+(?:\.\d+)?万$/.test(text)) return text + "円";
     return text;
   }
 
   function showPrice(value) {
-    var text = yen(value);
-    if (!text) return { text: "対象外", empty: true };
-    return { text: text, empty: false };
+    var text = String(value || "").replace(/[０-９]/g, function (ch) {
+      return String.fromCharCode(ch.charCodeAt(0) - 65248);
+    }).replace(/\s/g, "");
+    if (!text || text === "対象外" || text === "提供対象外" || text === "対応対象外" || text === "-" || text === "－" || text === "—" || text === "−") {
+      return { text: "提供対象外", empty: true, kind: "off" };
+    }
+    if (text === "別途見積もり" || text === "別途見積" || text === "未定") {
+      return { text: "別途見積もり", empty: false, kind: "quote" };
+    }
+    return { text: yen(value), empty: false, kind: "price" };
+  }
+
+  function writeShown(node, shown) {
+    node.classList.remove("na", "is-quote");
+    node.textContent = "";
+    if (shown.kind === "price") {
+      node.append(document.createTextNode(shown.text));
+      markYen(node);
+      return;
+    }
+    var mark = document.createElement("span");
+    mark.className = shown.kind === "quote" ? "status status-quote" : "status status-off";
+    mark.textContent = shown.text;
+    node.classList.add(shown.kind === "quote" ? "is-quote" : "na");
+    node.append(mark);
   }
 
   function markYen(node) {
@@ -133,9 +155,13 @@
 
   function renderNoted(cell, value, note) {
     var shown = showPrice(value);
-    cell.classList.toggle("na", shown.empty);
+    cell.classList.remove("na", "is-quote");
     cell.textContent = "";
-    if (!note || shown.empty) {
+    if (shown.kind !== "price") {
+      writeShown(cell, shown);
+      return;
+    }
+    if (!note) {
       cell.textContent = shown.text;
       markYen(cell);
       return;
@@ -149,10 +175,7 @@
   }
 
   function setPriceCell(cell, value) {
-    var shown = showPrice(value);
-    cell.classList.toggle("na", shown.empty);
-    cell.textContent = shown.text;
-    markYen(cell);
+    writeShown(cell, showPrice(value));
   }
 
   function priceLine(label, value, note) {
@@ -161,10 +184,8 @@
     span.textContent = label;
     var shown = showPrice(value);
     var strong = document.createElement("strong");
-    if (shown.empty) strong.className = "na";
-    strong.textContent = shown.text;
-    markYen(strong);
-    if (note && !shown.empty) {
+    writeShown(strong, shown);
+    if (note && shown.kind === "price") {
       var unit = document.createElement("span");
       unit.className = "unit";
       unit.textContent = note;
@@ -361,13 +382,16 @@
     amount.textContent = item.price || "15万円";
     var unit = document.createElement("span");
     unit.className = "plan-unit";
-    unit.textContent = item.unit != null ? item.unit : "/本";
+    unit.textContent = item.unit != null ? item.unit : "／本";
     strong.append(amount, unit);
     main.append(badge, strong);
     var single = document.createElement("p");
     single.className = "plan-single";
-    single.textContent = item.single || "1本のみ 20万円（税別）";
-    plan.append(main, single);
+    single.textContent = item.single || "1本のみ 20万円／本";
+    var insert = document.createElement("p");
+    insert.className = "plan-insert";
+    insert.textContent = item.insert != null ? item.insert : "インサート撮影込み";
+    plan.append(main, single, insert);
     head.append(titles, plan);
     var rule = document.createElement("hr");
     rule.className = "series-line";
@@ -412,6 +436,54 @@
     return li;
   }
 
+  function applyText(id, fields, leadClass) {
+    if (!fields) return;
+    var heading = document.getElementById(id);
+    if (heading && fields.title != null) heading.textContent = fields.title;
+    var intro = heading && heading.nextElementSibling;
+    if (intro && intro.classList.contains(leadClass || "section-lead") && fields.lead != null) {
+      intro.textContent = fields.lead;
+    }
+  }
+
+  function applyPage(page) {
+    if (!page) return;
+    if (page.company != null) {
+      document.querySelectorAll(".company").forEach(function (node) {
+        node.textContent = page.company;
+      });
+    }
+    var kicker = document.querySelector(".kicker");
+    var title = document.getElementById("page-title");
+    var promise = document.querySelector(".promise");
+    var lead = document.querySelector("p.lead");
+    if (kicker && page.kicker != null) kicker.textContent = page.kicker;
+    if (title && page.title != null) title.textContent = page.title;
+    if (promise && page.promise != null) promise.textContent = page.promise;
+    if (lead && page.lead != null) lead.textContent = page.lead;
+  }
+
+  function conditionItem(text) {
+    var li = document.createElement("li");
+    var name = document.createElement("span");
+    name.className = "condition-name";
+    name.textContent = text;
+    li.appendChild(name);
+    return li;
+  }
+
+  function applyConditions(data) {
+    applyText("conditions", data.conditionsIntro, "section-lead");
+    if (!Array.isArray(data.conditions)) return;
+    var host = document.querySelector("ul.conditions");
+    if (!host) return;
+    host.textContent = "";
+    data.conditions.forEach(function (text) {
+      var line = String(text || "").trim();
+      if (line) host.appendChild(conditionItem(line));
+    });
+  }
+
   function applyNotes(data) {
     var heading = document.getElementById("notes");
     if (data.notesIntro && heading) {
@@ -448,9 +520,12 @@
 
   function apply(data) {
     data = data || {};
+    applyPage(data.page);
     applyAims(data.aims);
+    applyText("single", data.menuIntro, "section-lead");
     applySeries(data);
     applyNotes(data);
+    applyConditions(data);
     document.querySelectorAll("[data-extra]").forEach(function (node) { node.remove(); });
     stampBase();
     (data.removed || []).forEach(function (id) {
