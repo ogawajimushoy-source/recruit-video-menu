@@ -75,6 +75,26 @@
       color: #3a3834;
       font-size: 15px;
     }
+    .page-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 22px;
+    }
+    .page-nav a {
+      display: inline-block;
+      padding: 6px 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--green-deep);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+    .page-nav a:hover { background: var(--pill); border-color: var(--green); }
+    #representative, #staff, #company, #series, #notes { scroll-margin-top: 16px; }
     .aims {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -530,6 +550,13 @@
 </head>
 <body>
   <main class="sheet">
+    <nav class="page-nav" aria-label="ページ内">
+      <a href="#representative">代表</a>
+      <a href="#staff">社員</a>
+      <a href="#company">会社</a>
+      <a href="#series">シリーズ</a>
+      <a href="#notes">注意事項</a>
+    </nav>
     <p class="company">株式会社ファディー</p>
     <p class="kicker">RECRUIT VIDEO PRODUCTION</p>
     <h1 id="page-title">採用動画 料金プラン</h1>
