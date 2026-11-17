@@ -1,7 +1,51 @@
 {
   "videos": {
-    "社員紹介（1名）": "https://www.youtube.com/watch?v=vQmKygPI9WM",
-    "ルームツアー": "https://www.youtube.com/watch?v=ALVprGWm7-o"
+    "事業計画": [
+      {
+        "label": "ASVレポート2024",
+        "url": "https://www.youtube.com/watch?v=D1mfMK4ESdc&list=PLV5Mh5pcHKycSmWlhmMlGmfmX5AH_aUPo&index=4"
+      }
+    ],
+    "社員紹介（1名）": [
+      {
+        "label": "C.Aさん",
+        "url": "https://www.youtube.com/watch?v=vQmKygPI9WM"
+      },
+      {
+        "label": "K.Tさん",
+        "url": "https://www.youtube.com/watch?v=WTU3Rb7_x5g"
+      }
+    ],
+    "row-1794462275393": [
+      {
+        "label": "御堂筋税理士法人",
+        "url": "https://www.youtube.com/watch?v=vQmKygPI9WM"
+      }
+    ],
+    "代表×社員 対談": [
+      {
+        "label": "ファディー",
+        "url": "https://www.youtube.com/watch?v=zlmgIdUrc0Y&t=1s"
+      }
+    ],
+    "社員×社員 対談": [
+      {
+        "label": "C.Aさん×K.Tさん",
+        "url": "https://www.youtube.com/watch?v=zlmgIdUrc0Y&t=1s"
+      }
+    ],
+    "ルームツアー": [
+      {
+        "label": "参考動画",
+        "url": "https://www.youtube.com/watch?v=ALVprGWm7-o"
+      }
+    ],
+    "row-1794807835279": [
+      {
+        "label": "Sky株式会社",
+        "url": "https://www.sky-recruit.jp/"
+      }
+    ]
   },
   "items": [
     {
@@ -32,6 +76,16 @@
       "video": "",
       "interview": "提供対象外",
       "workplace": "45万円"
+    },
+    {
+      "id": "row-1794807835279",
+      "category": "company",
+      "name": "HPトップムービー",
+      "description": "",
+      "duration": "2〜3分",
+      "video": "https://www.sky-recruit.jp/",
+      "single": "8万円",
+      "note": "（一律）"
     }
   ],
   "order": {
@@ -52,7 +106,8 @@
       "row-1794462538667",
       "row-1794529192476",
       "福利厚生紹介",
-      "ルームツアー"
+      "ルームツアー",
+      "row-1794807835279"
     ]
   },
   "overrides": {
