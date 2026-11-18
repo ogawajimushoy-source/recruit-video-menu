@@ -315,25 +315,6 @@
       line-height: 1.7;
     }
     .menu-block { margin-top: 72px; }
-    .block-split {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 200px;
-      gap: 20px 32px;
-      align-items: start;
-    }
-    .block-photo {
-      margin: 0;
-      background: #f3f1ec;
-      aspect-ratio: 3 / 4;
-      overflow: hidden;
-    }
-    .block-photo img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .block-photo img[hidden] { display: none; }
     tr.talk th,
     tr.talk td.samples { padding-top: 8px; padding-bottom: 0; border-bottom: 0; }
     tr.talk-lead th,
@@ -388,9 +369,9 @@
     }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    col.duration { width: 6.5rem; }
-    col.samples { width: 9.25rem; }
-    col.price { width: 7.75rem; }
+    col.duration { width: 14%; }
+    col.samples { width: 20%; }
+    col.price { width: 16%; }
     thead th {
       padding: 14px 16px;
       background: var(--head);
@@ -753,8 +734,6 @@
       .sheet { padding: 0 18px 64px; }
       .site-head { padding-left: 18px; padding-right: 18px; }
       .hero { margin-bottom: 32px; padding: 40px 0 32px; background: #f3f1ec; }
-      .block-split { display: flex; flex-direction: column; gap: 16px; }
-      .block-photo { order: -1; margin: 0; aspect-ratio: 16 / 9; }
       h1 { font-size: 34px; letter-spacing: 0.08em; }
       .promise { font-size: 17px; }
       h2 { font-size: 24px; letter-spacing: 0.12em; }
@@ -881,8 +860,6 @@
 
     <section class="menu-block" id="representative">
       <h3><span class="block-name">代表</span><span class="block-en">DIRECTOR</span></h3>
-      <div class="block-split">
-        <div class="block-copy">
       <div class="table-wrap">
         <table>
           <colgroup>
@@ -966,17 +943,10 @@
           <p class="tax-note">税別</p>
         </article>
       </div>
-        </div>
-        <figure class="block-photo">
-          <img src="images/representative.jpg" alt="" onerror="this.hidden=true">
-        </figure>
-      </div>
     </section>
 
     <section class="menu-block" id="staff">
       <h3><span class="block-name">社員</span><span class="block-en">STAFF</span></h3>
-      <div class="block-split">
-        <div class="block-copy">
       <div class="table-wrap">
         <table>
           <colgroup>
@@ -1087,17 +1057,10 @@
           <p class="tax-note">税別</p>
         </article>
       </div>
-        </div>
-        <figure class="block-photo">
-          <img src="images/staff.jpg" alt="" onerror="this.hidden=true">
-        </figure>
-      </div>
     </section>
 
     <section class="menu-block" id="company">
       <h3><span class="block-name">会社</span><span class="block-en">COMPANY</span></h3>
-      <div class="block-split">
-        <div class="block-copy">
       <div class="table-wrap">
         <table>
           <colgroup>
@@ -1198,11 +1161,6 @@
           </div>
           <p class="tax-note">税別</p>
         </article>
-      </div>
-        </div>
-        <figure class="block-photo">
-          <img src="images/company.jpg" alt="" onerror="this.hidden=true">
-        </figure>
       </div>
     </section>
 
