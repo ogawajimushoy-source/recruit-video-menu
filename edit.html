@@ -124,7 +124,10 @@
     body.editing .table-wrap { display: block; }
     body.editing .cards { display: none; }
     body.editing .menu-block { scroll-margin-top: 72px; }
-    body.editing .table-wrap table { min-width: 760px; }
+    body.editing .table-wrap table { min-width: 920px; }
+    body.editing col.samples { width: 14rem; }
+    body.editing td.samples { text-align: left; vertical-align: top; }
+    body.editing td.samples .video-list { margin-top: 0; }
     body.editing #stage tbody th,
     body.editing #stage tbody td { vertical-align: top; }
     body.editing #stage thead th:nth-child(2),
@@ -314,6 +317,7 @@
         white-space: normal;
       }
       body.editing #stage td.duration::before,
+      body.editing #stage td.samples::before,
       body.editing #stage td.price::before {
         display: block;
         margin-bottom: 2px;
@@ -323,8 +327,9 @@
         letter-spacing: 0.06em;
       }
       body.editing #stage td.duration::before { content: "尺の目安"; }
-      body.editing #stage td.price:nth-child(3)::before { content: "インサートなし"; }
-      body.editing #stage td.price:nth-child(4)::before { content: "インサートあり"; }
+      body.editing #stage td.samples::before { content: "参考動画"; }
+      body.editing #stage td.price:nth-child(4)::before { content: "インサートなし"; }
+      body.editing #stage td.price:nth-child(5)::before { content: "インサートあり"; }
       body.editing #stage td.price[colspan="2"]::before { content: "料金"; }
       body.editing #stage .price-input,
       body.editing #stage td.price .inline-edit { text-align: left; }
@@ -361,7 +366,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=16"></script>
+  <script src="menu.js?v=17"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -839,7 +844,7 @@
         var tr = document.createElement("tr");
         tr.className = "add-row";
         var td = document.createElement("td");
-        td.colSpan = 4;
+        td.colSpan = 5;
         td.append(button("add-video", "＋ 動画を追加", function () { openDraft(id); }));
         tr.append(td);
         tbody.append(tr);
@@ -1572,17 +1577,25 @@
         }
         bindEdit(amount || child, "price");
       });
+      var sampleCell = tr.querySelector("td.samples");
+      if (!sampleCell) {
+        sampleCell = document.createElement("td");
+        sampleCell.className = "samples";
+        var durationCell = tr.querySelector("td.duration");
+        if (durationCell) durationCell.after(sampleCell);
+        else th.after(sampleCell);
+      }
       var initial = [];
       if (Object.prototype.hasOwnProperty.call(state.videos, tr.dataset.id)) initial = state.videos[tr.dataset.id];
       else {
-        th.querySelectorAll("a.sample").forEach(function (link) {
+        tr.querySelectorAll("td.samples a.sample, th a.sample").forEach(function (link) {
           var url = MenuKit.safeUrl(link.href);
           if (url) initial.push({ label: link.textContent.trim() || "参考動画", url: url });
         });
       }
       if (MenuKit.normalizeVideos(initial).length) tracked[tr.dataset.id] = true;
-      th.querySelectorAll("a.sample, .samples").forEach(function (node) { node.remove(); });
-      th.append(videoEditor(initial, function (list) {
+      tr.querySelectorAll("td.samples .samples, td.samples > a.sample, th .samples, th > a.sample").forEach(function (node) { node.remove(); });
+      sampleCell.append(videoEditor(initial, function (list) {
         state.videos[tr.dataset.id] = list;
         tracked[tr.dataset.id] = true;
         markDirty();
@@ -1621,7 +1634,7 @@
         var row = document.createElement("tr");
         row.className = "add-row";
         var cell = document.createElement("td");
-        cell.colSpan = 4;
+        cell.colSpan = 5;
         cell.append(button("add-video", "＋ 動画を追加", function () { addBlank(id); }));
         row.append(cell);
         tbody.append(row);

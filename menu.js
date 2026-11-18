@@ -122,10 +122,7 @@
     return !!fields && Object.prototype.hasOwnProperty.call(fields, "single");
   }
 
-  function setVideos(host, value) {
-    host.querySelectorAll(".samples, a.sample").forEach(function (node) { node.remove(); });
-    var list = normalizeVideos(value);
-    if (!list.length) return;
+  function sampleList(list) {
     var wrap = document.createElement("div");
     wrap.className = "samples";
     list.forEach(function (item) {
@@ -137,21 +134,85 @@
       link.textContent = item.label;
       wrap.appendChild(link);
     });
-    var desc = host.querySelector(".desc");
-    if (desc) {
-      var row = desc.parentElement;
-      if (!row || !row.classList.contains("desc-row")) {
-        row = document.createElement("div");
-        row.className = "desc-row";
-        desc.replaceWith(row);
-        row.append(desc);
+    return wrap;
+  }
+
+  function ensureSamplesCell(tr) {
+    var cell = null;
+    Array.prototype.forEach.call(tr.children, function (child) {
+      if (child.classList && child.classList.contains("samples")) cell = child;
+    });
+    if (cell) return cell;
+    cell = document.createElement("td");
+    cell.className = "samples";
+    var duration = tr.querySelector("td.duration");
+    if (duration) duration.after(cell);
+    else {
+      var heading = tr.querySelector("th");
+      if (heading) heading.after(cell);
+      else tr.appendChild(cell);
+    }
+    return cell;
+  }
+
+  function clearInlineSamples(root) {
+    if (!root) return;
+    root.querySelectorAll("th .samples, th > a.sample").forEach(function (node) { node.remove(); });
+    root.querySelectorAll(".desc-row").forEach(function (row) {
+      var desc = row.querySelector(".desc");
+      if (desc) row.replaceWith(desc);
+      else row.remove();
+    });
+  }
+
+  function placeCardSamples(card, block) {
+    var prices = card.querySelector(".card-prices");
+    if (prices) prices.before(block);
+    else {
+      var meta = card.querySelector(".meta");
+      if (meta) meta.after(block);
+      else card.appendChild(block);
+    }
+  }
+
+  function setVideos(host, value) {
+    var list = normalizeVideos(value);
+    if (host.classList && host.classList.contains("talk-line")) {
+      var card = host.closest("article");
+      if (!card) return;
+      var lineId = host.getAttribute("data-line") || "";
+      host.querySelectorAll(".samples, a.sample").forEach(function (node) { node.remove(); });
+      var stack = card.querySelector(".sample-stack");
+      if (stack) {
+        Array.prototype.forEach.call(Array.prototype.slice.call(stack.children), function (node) {
+          if (node.getAttribute("data-line") === lineId) node.remove();
+        });
+        if (!stack.children.length) stack.remove();
       }
-      row.append(wrap);
+      if (!list.length) return;
+      stack = card.querySelector(".sample-stack");
+      if (!stack) {
+        stack = document.createElement("div");
+        stack.className = "sample-stack";
+        placeCardSamples(card, stack);
+      }
+      var block = sampleList(list);
+      block.setAttribute("data-line", lineId);
+      stack.appendChild(block);
       return;
     }
-    var prices = host.querySelector(".card-prices");
-    if (prices) prices.before(wrap);
-    else host.appendChild(wrap);
+    var tr = host.closest ? host.closest("tr") : null;
+    if (tr) {
+      clearInlineSamples(tr);
+      var cell = ensureSamplesCell(tr);
+      cell.querySelectorAll(".samples, a.sample").forEach(function (node) { node.remove(); });
+      if (list.length) cell.appendChild(sampleList(list));
+      return;
+    }
+    host.querySelectorAll(":scope > .samples, :scope > a.sample").forEach(function (node) { node.remove(); });
+    clearInlineSamples(host);
+    if (!list.length) return;
+    placeCardSamples(host, sampleList(list));
   }
 
   function peelNote(value) {
@@ -289,11 +350,12 @@
     desc.className = "desc";
     desc.textContent = item.description || "";
     heading.append(name, desc);
-    if (url) setVideos(heading, url);
     var duration = document.createElement("td");
     duration.className = "duration";
     duration.textContent = item.duration || "";
-    row.append(heading, duration);
+    var samples = document.createElement("td");
+    samples.className = "samples";
+    row.append(heading, duration, samples);
     if (isSingle(item) || item.single) {
       var single = document.createElement("td");
       single.className = "price";
@@ -309,6 +371,7 @@
         row.append(cell);
       });
     }
+    if (url) setVideos(row, url);
     section.querySelector("tbody").append(row);
 
     var card = document.createElement("article");
@@ -393,6 +456,9 @@
   }
 
   function applyVideos(videos) {
+    document.querySelectorAll(".menu-block tbody tr").forEach(function (tr) {
+      if (!tr.classList.contains("add-row")) ensureSamplesCell(tr);
+    });
     document.querySelectorAll("tr[data-id], article.card[data-id]").forEach(function (node) {
       var id = node.dataset.id;
       var nameEl = node.querySelector(".name, h4");
@@ -402,8 +468,7 @@
       if (!hasId && !hasName) return;
       var list = hasId ? videos[id] : videos[name];
       if (node.tagName === "ARTICLE" && node.querySelector(".talk-line")) return;
-      var host = node.tagName === "TR" ? node.querySelector("th") : node;
-      setVideos(host, list);
+      setVideos(node, list);
       document.querySelectorAll(".talk-line").forEach(function (line) {
         if (line.getAttribute("data-line") === id) setVideos(line, list);
       });

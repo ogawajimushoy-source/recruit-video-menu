@@ -285,8 +285,8 @@
     .menu-block { margin-top: 72px; }
     .block-split {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(200px, 30%);
-      gap: 20px 48px;
+      grid-template-columns: minmax(0, 1fr) 200px;
+      gap: 20px 32px;
       align-items: start;
     }
     .block-photo {
@@ -302,9 +302,12 @@
       object-fit: cover;
     }
     .block-photo img[hidden] { display: none; }
-    tr.talk th { padding-top: 14px; padding-bottom: 0; border-bottom: 0; }
-    tr.talk-lead th { padding-top: 22px; }
-    tr.talk-end th { padding-bottom: 22px; border-bottom: 1px solid #e4ddd3; }
+    tr.talk th,
+    tr.talk td.samples { padding-top: 8px; padding-bottom: 0; border-bottom: 0; }
+    tr.talk-lead th,
+    tr.talk-lead td.samples { padding-top: 22px; }
+    tr.talk-end th,
+    tr.talk-end td.samples { padding-bottom: 22px; border-bottom: 1px solid #e4ddd3; }
     .talk-line + .talk-line { margin-top: 14px; }
     .menu-block h3 {
       display: flex;
@@ -353,8 +356,9 @@
     }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    col.duration { width: 7.5rem; }
-    col.price { width: 9.25rem; }
+    col.duration { width: 6.5rem; }
+    col.samples { width: 9.25rem; }
+    col.price { width: 7.75rem; }
     thead th {
       padding: 14px 16px;
       background: var(--head);
@@ -391,7 +395,8 @@
       text-align: left;
       vertical-align: middle;
     }
-    td.duration, td.price { text-align: center; }
+    td.duration, td.price, td.samples { text-align: center; }
+    td.duration, td.price, td.samples { padding-left: 8px; padding-right: 8px; }
     .name {
       display: block;
       color: #333;
@@ -416,18 +421,28 @@
       margin-top: 6px;
     }
     .desc-row .desc { display: inline; margin-top: 0; }
-    .samples {
-      display: inline-flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 2px 12px;
+    div.samples, .sample-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
       margin: 0;
     }
+    .sample-stack:empty { display: none; }
+    .card > div.samples,
+    .card > .sample-stack,
+    .card .sample-stack div.samples {
+      align-items: flex-start;
+    }
+    .card > div.samples,
+    .card > .sample-stack { margin-top: 12px; }
     .sample {
       display: inline;
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 0.04em;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
       text-underline-offset: 3px;
     }
     .talk-label {
@@ -817,6 +832,7 @@
           <colgroup>
             <col>
             <col class="duration">
+            <col class="samples">
             <col class="price">
             <col class="price">
           </colgroup>
@@ -824,6 +840,7 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
+              <th scope="col">参考動画</th>
               <th class="num" scope="colgroup" colspan="2"><span class="pair"><span class="col-label">インサートなし</span><span class="col-label">インサートあり</span></span></th>
             </tr>
           </thead>
@@ -834,6 +851,7 @@
                 <span class="desc">求職者への直接の呼びかけ</span>
               </th>
               <td class="duration">2〜3分</td>
+              <td class="samples"></td>
               <td class="price">20万円</td>
               <td class="price">30万円</td>
             </tr>
@@ -843,6 +861,7 @@
                 <span class="desc">これからの事業と成長の道筋</span>
               </th>
               <td class="duration">3〜5分</td>
+              <td class="samples"></td>
               <td class="price">25万円</td>
               <td class="price">35万円</td>
             </tr>
@@ -852,6 +871,7 @@
                 <span class="desc">人柄がテンポよく伝わる</span>
               </th>
               <td class="duration">8〜15分</td>
+              <td class="samples"></td>
               <td class="price">35万円</td>
               <td class="price na"><span class="status status-off">提供対象外</span></td>
             </tr>
@@ -906,6 +926,7 @@
           <colgroup>
             <col>
             <col class="duration">
+            <col class="samples">
             <col class="price">
             <col class="price">
           </colgroup>
@@ -913,6 +934,7 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
+              <th scope="col">参考動画</th>
               <th class="num" scope="colgroup" colspan="2"><span class="pair"><span class="col-label">インサートなし</span><span class="col-label">インサートあり</span></span></th>
             </tr>
           </thead>
@@ -921,9 +943,9 @@
               <th scope="row">
                 <span class="name">社員紹介（1名）</span>
                 <span class="desc">一人のリアルなキャリアと人柄</span>
-                <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
               </th>
               <td class="duration">2〜3分</td>
+              <td class="samples"><a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a></td>
               <td class="price">20万円</td>
               <td class="price">30万円</td>
             </tr>
@@ -933,6 +955,7 @@
                 <span class="desc">等身大の社員像がテンポよく伝わる</span>
               </th>
               <td class="duration">8〜15分</td>
+              <td class="samples"></td>
               <td class="price">35万円</td>
               <td class="price na"><span class="status status-off">提供対象外</span></td>
             </tr>
@@ -943,6 +966,7 @@
                 <span class="desc">代表と現場の距離感</span>
               </th>
               <td class="duration" rowspan="3">8〜15分</td>
+              <td class="samples"></td>
               <td class="price" rowspan="3">30万円</td>
               <td class="price" rowspan="3">40万円</td>
             </tr>
@@ -951,12 +975,14 @@
                 <span class="name">社員×社員</span>
                 <span class="desc">同期・先輩後輩・部署を越えた関係性</span>
               </th>
+              <td class="samples"></td>
             </tr>
             <tr class="talk talk-end" data-id="座談会（3〜4名）" data-talk="代表×社員 対談">
               <th scope="row">
                 <span class="name">座談会（3〜4名）</span>
                 <span class="desc">社内の空気感と人のつながり</span>
               </th>
+              <td class="samples"></td>
             </tr>
           </tbody>
         </table>
@@ -966,7 +992,7 @@
           <h4>社員紹介（1名）</h4>
           <p class="desc">一人のリアルなキャリアと人柄</p>
           <p class="meta">動画の尺：2〜3分</p>
-          <a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a>
+          <div class="samples"><a class="sample" href="https://www.youtube.com/watch?v=vQmKygPI9WM" target="_blank" rel="noopener noreferrer">参考動画</a></div>
           <div class="card-prices">
             <p><span>インサートなし</span><strong>20万円</strong></p>
             <p><span>インサートあり</span><strong>30万円</strong></p>
@@ -1021,6 +1047,7 @@
           <colgroup>
             <col>
             <col class="duration">
+            <col class="samples">
             <col class="price">
             <col class="price">
           </colgroup>
@@ -1028,6 +1055,7 @@
             <tr>
               <th scope="col">動画の種類</th>
               <th scope="col">尺の目安</th>
+              <th scope="col">参考動画</th>
               <th class="num" scope="colgroup" colspan="2"><span class="pair"><span class="col-label">インサートなし</span><span class="col-label">インサートあり</span></span></th>
             </tr>
           </thead>
@@ -1038,6 +1066,7 @@
                 <span class="desc">会社の全体像をひと目で</span>
               </th>
               <td class="duration">3〜5分</td>
+              <td class="samples"></td>
               <td class="price na"><span class="status status-off">提供対象外</span></td>
               <td class="price">45万円</td>
             </tr>
@@ -1047,6 +1076,7 @@
                 <span class="desc">仕事の中身とビジネスモデル</span>
               </th>
               <td class="duration">3〜5分</td>
+              <td class="samples"></td>
               <td class="price na"><span class="status status-off">提供対象外</span></td>
               <td class="price">45万円</td>
             </tr>
@@ -1056,6 +1086,7 @@
                 <span class="desc">制度を、使っている社員の声とともに</span>
               </th>
               <td class="duration">3〜5分</td>
+              <td class="samples"></td>
               <td class="price">25万円</td>
               <td class="price">35万円</td>
             </tr>
@@ -1065,6 +1096,7 @@
                 <span class="desc">働く環境とオフィスの雰囲気</span>
               </th>
               <td class="duration">2〜4分</td>
+              <td class="samples"></td>
               <td class="price" colspan="2">25万円<span class="unit">（一律）</span></td>
             </tr>
           </tbody>
