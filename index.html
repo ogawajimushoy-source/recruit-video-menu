@@ -131,7 +131,7 @@
     .aims {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
+      gap: 18px;
       margin: 8px 0 0;
       padding: 0;
       list-style: none;
@@ -139,23 +139,22 @@
     .aims a {
       display: block;
       height: 100%;
-      padding: 18px 0 4px;
-      background: none;
-      border: 0;
-      border-top: 1px solid var(--line);
-      border-radius: 0;
+      padding: 22px 20px 18px;
+      background: #fff;
+      border: 1px solid #e6e2da;
+      border-radius: 2px;
       color: inherit;
       text-decoration: none;
     }
-    .aims a:hover { border-top-color: #b7b1a6; }
-    .aims span {
+    .aims a:hover { border-color: #cfc9be; }
+    .aims a > span {
       display: block;
       color: var(--muted);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.16em;
     }
-    .aims strong {
+    .aims a > strong {
       display: block;
       margin-top: 8px;
       font-family: "Shippori Mincho", "Yu Mincho", serif;
@@ -164,6 +163,32 @@
       letter-spacing: 0.04em;
       line-height: 1.7;
       text-wrap: balance;
+    }
+    .aim-prices {
+      margin: 16px 0 0;
+      padding-top: 12px;
+      border-top: 1px solid #f0eeea;
+    }
+    .aim-price {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 8px 0 0;
+      color: #333;
+      font-size: 14px;
+    }
+    .aim-price span {
+      color: #8a8680;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+    .aim-price strong {
+      font-family: "Zen Kaku Gothic New", "Yu Gothic", "Meiryo", sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0;
     }
     .aims em {
       display: block;
@@ -667,6 +692,10 @@
           <span>代表・経営者</span>
           <strong>経営者の想いや会社の方向性を伝えたい</strong>
           <em>代表者メッセージ、事業計画、代表が語るシリーズ</em>
+          <div class="aim-prices">
+            <p class="aim-price"><span>インサートなし</span><strong>20万円〜</strong></p>
+            <p class="aim-price"><span>インサートあり</span><strong>30万円〜</strong></p>
+          </div>
         </a>
       </li>
       <li>
@@ -674,6 +703,10 @@
           <span>社員・職場</span>
           <strong>一緒に働く社員の人柄を伝えたい</strong>
           <em>社員紹介、社員同士の対談、座談会</em>
+          <div class="aim-prices">
+            <p class="aim-price"><span>インサートなし</span><strong>20万円〜</strong></p>
+            <p class="aim-price"><span>インサートあり</span><strong>30万円〜</strong></p>
+          </div>
         </a>
       </li>
       <li>
@@ -681,6 +714,10 @@
           <span>会社・仕事</span>
           <strong>会社の雰囲気や仕事内容を伝えたい</strong>
           <em>会社紹介、事業内容紹介、福利厚生紹介、オフィスツアー</em>
+          <div class="aim-prices">
+            <p class="aim-price"><span>インサートなし</span><strong>20万円〜</strong></p>
+            <p class="aim-price"><span>インサートあり</span><strong>30万円〜</strong></p>
+          </div>
         </a>
       </li>
     </ul>
