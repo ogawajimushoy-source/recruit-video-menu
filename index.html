@@ -392,21 +392,47 @@
       line-height: 1.7;
     }
     .desc:empty { display: none; }
-    .samples {
+    .desc-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px 14px;
-      margin-top: 8px;
+      align-items: baseline;
+      gap: 2px 12px;
+      margin-top: 6px;
+    }
+    .desc-row .desc { display: inline; margin-top: 0; }
+    .samples {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 12px;
+      margin: 0;
     }
     .sample {
-      display: inline-block;
-      margin-top: 8px;
+      display: inline;
       font-size: 13px;
       font-weight: 500;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
       text-underline-offset: 3px;
     }
-    .samples .sample { margin-top: 0; }
+    .talk-label {
+      display: block;
+      margin: 0 0 12px;
+      color: #333;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    tr.talk .name::before,
+    .talk-line h4::before { content: "・"; }
+    tr.talk .desc-row,
+    .talk-line .desc-row,
+    tr.talk .desc,
+    .talk-line .desc { margin-left: 1.1em; }
+    .card .talk-label {
+      margin-bottom: 14px;
+      font-size: 17px;
+      font-weight: 700;
+    }
     .yen-unit { font-size: 0.68em; font-weight: 500; letter-spacing: 0; }
     .plan-main strong .yen-unit,
     .price .yen-unit,
@@ -886,6 +912,7 @@
             </tr>
             <tr class="talk talk-lead" data-id="代表×社員 対談">
               <th scope="row">
+                <span class="talk-label">対談</span>
                 <span class="name">代表×社員</span>
                 <span class="desc">代表と現場の距離感</span>
               </th>
@@ -931,6 +958,7 @@
           <p class="tax-note">税別</p>
         </article>
         <article class="card" data-id="代表×社員 対談">
+          <p class="talk-label">対談</p>
           <div class="talk-line" data-line="代表×社員 対談">
             <h4>代表×社員</h4>
             <p class="desc">代表と現場の距離感</p>

@@ -123,9 +123,7 @@
   }
 
   function setVideos(host, value) {
-    var existing = host.querySelector(".samples");
-    if (existing) existing.remove();
-    host.querySelectorAll("a.sample").forEach(function (node) { node.remove(); });
+    host.querySelectorAll(".samples, a.sample").forEach(function (node) { node.remove(); });
     var list = normalizeVideos(value);
     if (!list.length) return;
     var wrap = document.createElement("div");
@@ -139,10 +137,20 @@
       link.textContent = item.label;
       wrap.appendChild(link);
     });
-    var prices = host.querySelector(".card-prices");
     var desc = host.querySelector(".desc");
+    if (desc) {
+      var row = desc.parentElement;
+      if (!row || !row.classList.contains("desc-row")) {
+        row = document.createElement("div");
+        row.className = "desc-row";
+        desc.replaceWith(row);
+        row.append(desc);
+      }
+      row.append(wrap);
+      return;
+    }
+    var prices = host.querySelector(".card-prices");
     if (prices) prices.before(wrap);
-    else if (desc) desc.after(wrap);
     else host.appendChild(wrap);
   }
 
