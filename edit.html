@@ -361,7 +361,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=13"></script>
+  <script src="menu.js?v=14"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -1351,6 +1351,7 @@
       if (direction < 0) tr.parentElement.insertBefore(tr, sibling);
       else tr.parentElement.insertBefore(sibling, tr);
       syncCardOrder(tr.closest("section"));
+      if (window.MenuKit && MenuKit.placeGroups) MenuKit.placeGroups(tr.closest("section"));
       markDirty();
     }
 
@@ -1590,6 +1591,7 @@
         var after = event.clientY > rect.top + rect.height / 2;
         tr.parentElement.insertBefore(source, after ? tr.nextElementSibling : tr);
         syncCardOrder(tr.closest("section"));
+        if (window.MenuKit && MenuKit.placeGroups) MenuKit.placeGroups(tr.closest("section"));
         markDirty();
       });
     }

@@ -148,14 +148,14 @@
       "workplace": "提供対象外"
     },
     "代表×社員 対談": {
-      "name": "代表×社員 対談",
+      "name": "代表×社員",
       "description": "代表と現場の距離感",
       "duration": "8〜15分",
       "interview": "30万円",
       "workplace": "40万円"
     },
     "社員×社員 対談": {
-      "name": "社員×社員 対談",
+      "name": "社員×社員",
       "description": "同期・先輩後輩・部署を越えた関係性",
       "duration": "8〜15分",
       "interview": "30万円",

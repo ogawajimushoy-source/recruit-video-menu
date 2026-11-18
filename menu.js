@@ -344,6 +344,18 @@
     rows.forEach(function (row) { container.appendChild(row); });
   }
 
+  function placeGroups(root) {
+    (root || document).querySelectorAll("[data-group]").forEach(function (label) {
+      var host = label.parentElement;
+      if (!host) return;
+      var anchor = null;
+      Array.prototype.forEach.call(host.children, function (node) {
+        if (!anchor && node.dataset && node.dataset.id === label.getAttribute("data-group")) anchor = node;
+      });
+      if (anchor) host.insertBefore(label, anchor);
+    });
+  }
+
   function applyVideos(videos) {
     document.querySelectorAll("tr[data-id], article.card[data-id]").forEach(function (node) {
       var id = node.dataset.id;
@@ -546,6 +558,7 @@
       reorder(section.querySelector(".cards"), order[category]);
     });
     applyVideos(data.videos || {});
+    placeGroups();
     decoratePrices();
   }
 
@@ -568,6 +581,7 @@
     markYen: markYen,
     normalizeVideos: normalizeVideos,
     apply: apply,
+    placeGroups: placeGroups,
     addItem: appendItem,
     seriesArticle: seriesArticle,
     load: load

@@ -75,10 +75,10 @@
       letter-spacing: 0.22em;
     }
     .hero {
-      margin: 0 0 48px;
-      padding: 76px 0 64px;
-      background: #f3f1ec;
-      box-shadow: 50vw 0 0 0 #f3f1ec, -50vw 0 0 0 #f3f1ec;
+      margin: 0 0 40px;
+      padding: 52px 0 40px 48px;
+      background: linear-gradient(90deg, transparent 0 48px, #f3f1ec 48px);
+      box-shadow: 50vw 0 0 0 #f3f1ec;
       text-align: left;
     }
     .hero-line {
@@ -276,13 +276,35 @@
       box-shadow: 50vw 0 0 0 #f3f1ec, -50vw 0 0 0 #f3f1ec;
     }
     #staff thead th,
-    #staff thead th.num { background: #e6e1d8; }
+    #staff thead th.num { background: #fff; }
     #staff tbody th,
-    #staff tbody td { background: #fff; }
+    #staff tbody td {
+      background: transparent;
+      border-bottom-color: #e4ddd3;
+    }
     #staff .card {
-      background: #fff;
-      padding: 16px 16px 8px;
+      background: transparent;
+      border-top-color: #e4ddd3;
+    }
+    .group-row th {
+      padding: 28px 0 6px;
       border: 0;
+      background: transparent;
+      color: #2f2f2f;
+      font-family: "Shippori Mincho", "Yu Mincho", serif;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+    }
+    .talk .name::before,
+    .talk h4::before { content: "・"; }
+    .group-label {
+      margin: 28px 0 4px;
+      color: #2f2f2f;
+      font-family: "Shippori Mincho", "Yu Mincho", serif;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
     }
     .menu-block h3 {
       display: flex;
@@ -657,7 +679,11 @@
     @media (max-width: 800px) {
       .sheet { padding: 0 18px 64px; }
       .site-head { padding-left: 18px; padding-right: 18px; }
-      .hero { margin-bottom: 36px; padding: 52px 0 40px; }
+      .hero {
+        margin-bottom: 32px;
+        padding: 40px 0 32px 28px;
+        background: linear-gradient(90deg, transparent 0 28px, #f3f1ec 28px);
+      }
       #staff { padding: 44px 0 32px; }
       h1 { font-size: 34px; letter-spacing: 0.08em; }
       .promise { font-size: 17px; }
@@ -878,25 +904,28 @@
               <td class="price">35万円</td>
               <td class="price na"><span class="status status-off">提供対象外</span></td>
             </tr>
-            <tr>
+            <tr class="group-row" data-group="代表×社員 対談">
+              <th colspan="4" scope="row">対談動画</th>
+            </tr>
+            <tr class="talk" data-id="代表×社員 対談">
               <th scope="row">
-                <span class="name">代表×社員 対談</span>
+                <span class="name">代表×社員</span>
                 <span class="desc">代表と現場の距離感</span>
               </th>
               <td class="duration">8〜15分</td>
               <td class="price">30万円</td>
               <td class="price">40万円</td>
             </tr>
-            <tr>
+            <tr class="talk" data-id="社員×社員 対談">
               <th scope="row">
-                <span class="name">社員×社員 対談</span>
+                <span class="name">社員×社員</span>
                 <span class="desc">同期・先輩後輩・部署を越えた関係性</span>
               </th>
               <td class="duration">8〜15分</td>
               <td class="price">30万円</td>
               <td class="price">40万円</td>
             </tr>
-            <tr>
+            <tr class="talk" data-id="座談会（3〜4名）">
               <th scope="row">
                 <span class="name">座談会（3〜4名）</span>
                 <span class="desc">社内の空気感と人のつながり</span>
@@ -930,8 +959,9 @@
           </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card">
-          <h4>代表×社員 対談</h4>
+        <p class="group-label" data-group="代表×社員 対談">対談動画</p>
+        <article class="card talk" data-id="代表×社員 対談">
+          <h4>代表×社員</h4>
           <p class="desc">代表と現場の距離感</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
@@ -940,8 +970,8 @@
           </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card">
-          <h4>社員×社員 対談</h4>
+        <article class="card talk" data-id="社員×社員 対談">
+          <h4>社員×社員</h4>
           <p class="desc">同期・先輩後輩・部署を越えた関係性</p>
           <p class="meta">動画の尺：8〜15分</p>
           <div class="card-prices">
@@ -950,7 +980,7 @@
           </div>
           <p class="tax-note">税別</p>
         </article>
-        <article class="card">
+        <article class="card talk" data-id="座談会（3〜4名）">
           <h4>座談会（3〜4名）</h4>
           <p class="desc">社内の空気感と人のつながり</p>
           <p class="meta">動画の尺：8〜15分</p>
