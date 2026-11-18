@@ -245,9 +245,23 @@
     prices.append(priceLine(PRICE_LABELS[1], fields.workplace));
   }
 
+  function writeLine(id, fields) {
+    if (!fields) return;
+    var line = null;
+    document.querySelectorAll(".talk-line").forEach(function (node) {
+      if (node.getAttribute("data-line") === id) line = node;
+    });
+    if (!line) return;
+    var name = line.querySelector("h4, .name");
+    var desc = line.querySelector(".desc");
+    if (fields.name != null && name) name.textContent = fields.name;
+    if (fields.description != null && desc) desc.textContent = fields.description;
+  }
+
   function applyFields(id, fields) {
     writeRow(findTagged("tr[data-id]", id), fields);
     writeCard(findTagged("article[data-id]", id), fields);
+    writeLine(id, fields);
   }
 
   function appendItem(item) {
@@ -344,15 +358,29 @@
     rows.forEach(function (row) { container.appendChild(row); });
   }
 
+  var TALK = ["代表×社員 対談", "社員×社員 対談", "座談会（3〜4名）"];
+
   function placeGroups(root) {
-    (root || document).querySelectorAll("[data-group]").forEach(function (label) {
-      var host = label.parentElement;
-      if (!host) return;
-      var anchor = null;
-      Array.prototype.forEach.call(host.children, function (node) {
-        if (!anchor && node.dataset && node.dataset.id === label.getAttribute("data-group")) anchor = node;
+    (root || document).querySelectorAll("tbody").forEach(function (tbody) {
+      var rows = [];
+      TALK.forEach(function (id) {
+        Array.prototype.forEach.call(tbody.children, function (node) {
+          if (node.dataset && node.dataset.id === id) rows.push(node);
+        });
       });
-      if (anchor) host.insertBefore(label, anchor);
+      if (rows.length < 2) return;
+      rows.forEach(function (row, index) {
+        if (index > 0) tbody.insertBefore(row, rows[index - 1].nextSibling);
+      });
+      rows.forEach(function (row, index) {
+        row.classList.add("talk");
+        row.classList.toggle("talk-lead", index === 0);
+        row.classList.toggle("talk-end", index === rows.length - 1);
+        if (index > 0) row.dataset.talk = rows[0].dataset.id;
+        Array.prototype.forEach.call(row.children, function (cell) {
+          if (cell.classList.contains("duration") || cell.classList.contains("price")) cell.rowSpan = rows.length;
+        });
+      });
     });
   }
 
@@ -364,8 +392,13 @@
       var hasId = Object.prototype.hasOwnProperty.call(videos, id);
       var hasName = !!name && Object.prototype.hasOwnProperty.call(videos, name);
       if (!hasId && !hasName) return;
+      var list = hasId ? videos[id] : videos[name];
+      if (node.tagName === "ARTICLE" && node.querySelector(".talk-line")) return;
       var host = node.tagName === "TR" ? node.querySelector("th") : node;
-      setVideos(host, hasId ? videos[id] : videos[name]);
+      setVideos(host, list);
+      document.querySelectorAll(".talk-line").forEach(function (line) {
+        if (line.getAttribute("data-line") === id) setVideos(line, list);
+      });
     });
   }
 

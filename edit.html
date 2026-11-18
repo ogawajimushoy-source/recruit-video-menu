@@ -361,7 +361,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=14"></script>
+  <script src="menu.js?v=15"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";
@@ -1200,9 +1200,25 @@
       if (cells.length === 1) {
         fields.single = cellAmount(cells[0]);
         fields.note = cellNote(cells[0]) || "（一律）";
-      } else {
-        fields.interview = cells[0] ? cells[0].textContent.trim() : "";
+      } else if (cells.length) {
+        fields.interview = cells[0].textContent.trim();
         fields.workplace = cells[1] ? cells[1].textContent.trim() : "";
+      } else if (tr.dataset.talk) {
+        var lead = null;
+        document.querySelectorAll("tr[data-id]").forEach(function (row) {
+          if (row.dataset.id === tr.dataset.talk) lead = row;
+        });
+        if (lead && lead !== tr) {
+          var shared = readRow(lead);
+          fields.duration = shared.duration;
+          if (shared.single != null) {
+            fields.single = shared.single;
+            fields.note = shared.note;
+          } else {
+            fields.interview = shared.interview;
+            fields.workplace = shared.workplace;
+          }
+        }
       }
       return fields;
     }
@@ -1509,6 +1525,7 @@
       up.title = "上へ";
       down.title = "下へ";
       tools.append(grip, up, down);
+      if (priceCells(tr).length) {
       var modeBtn = button("text-btn do-mode", priceCells(tr).length === 1 ? "インサートあり/なし" : "一律", function () {
         var cells = priceCells(tr);
         if (cells.length === 1) {
@@ -1525,6 +1542,7 @@
       });
       modeBtn.title = "料金の書き方を切り替える";
       tools.append(modeBtn);
+      }
       var remove = button("text-btn do-remove", "×", function () {
         var section = tr.closest("section");
         if (tr.dataset.extra !== "1") removed[tr.dataset.id] = true;
