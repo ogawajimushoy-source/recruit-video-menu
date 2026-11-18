@@ -665,13 +665,10 @@
   }
 
   function speakPop(lines) {
-    var hint = document.createElement("span");
-    hint.className = "speak-hint";
-    hint.textContent = "テーマ例";
     var pop = document.createElement("div");
     pop.className = "speak-pop";
     var label = document.createElement("p");
-    label.textContent = "話すテーマの例";
+    label.textContent = "テーマ";
     var list = document.createElement("ul");
     lines.forEach(function (text) {
       var item = document.createElement("li");
@@ -679,7 +676,7 @@
       list.appendChild(item);
     });
     pop.append(label, list);
-    return { hint: hint, pop: pop };
+    return pop;
   }
 
   function placeSpeak(host, id, name) {
@@ -687,10 +684,10 @@
     host.querySelectorAll(":scope > .speak-hint, :scope > .speak-pop").forEach(function (node) { node.remove(); });
     var lines = speakLines(id, name);
     if (!lines) return;
-    var built = speakPop(lines);
+    var pop = speakPop(lines);
     var desc = host.querySelector(":scope > .desc");
-    if (desc) desc.after(built.hint, built.pop);
-    else host.append(built.hint, built.pop);
+    if (desc) desc.after(pop);
+    else host.append(pop);
   }
 
   function applyThemes() {

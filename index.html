@@ -370,9 +370,9 @@
     }
     .table-wrap { overflow: visible; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    col.duration { width: 14%; }
-    col.samples { width: 20%; }
-    col.price { width: 16%; }
+    col.duration { width: 11%; }
+    col.samples { width: 17%; }
+    col.price { width: 13%; }
     thead th {
       padding: 14px 16px;
       background: var(--head);
@@ -472,35 +472,25 @@
     tr.talk .desc-row,
     .talk-line .desc-row,
     tr.talk .desc,
-    .talk-line .desc,
-    tr.talk .speak-hint,
-    .talk-line .speak-hint,
-    tr.talk .speak-pop,
-    .talk-line .speak-pop { margin-left: 1.1em; }
-    tbody th { position: relative; }
-    .speak-hint {
-      display: block;
-      margin-top: 8px;
-      color: #b7b2aa;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.14em;
-    }
+    .talk-line .desc { margin-left: 1.1em; }
+    tbody th { position: relative; height: 152px; padding-right: 208px; }
     .speak-pop {
       position: absolute;
       z-index: 4;
-      left: 16px;
-      top: calc(100% - 12px);
-      width: 240px;
+      top: 16px;
+      right: 16px;
+      left: auto;
+      width: 196px;
       margin: 0;
-      padding: 12px 14px 10px;
+      padding: 8px 10px 6px;
       background: #fff;
       border: 1px solid #e6e2da;
       border-radius: 2px;
       box-shadow: 0 12px 28px rgba(70, 60, 45, 0.1);
+      text-align: left;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(8px);
+      transform: translateY(6px);
       pointer-events: none;
       transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
     }
@@ -515,7 +505,7 @@
       transform: translateY(0);
     }
     .speak-pop p {
-      margin: 0 0 6px;
+      margin: 0 0 4px;
       color: var(--green);
       font-size: 11px;
       font-weight: 500;
@@ -529,10 +519,10 @@
     .speak-pop li {
       position: relative;
       margin: 0;
-      padding: 2px 0 2px 0.9em;
+      padding: 1px 0 1px 0.85em;
       color: #3a3a3a;
-      font-size: 13px;
-      line-height: 1.55;
+      font-size: 12px;
+      line-height: 1.4;
     }
     .speak-pop li::before {
       content: "";
@@ -862,6 +852,7 @@
         visibility: visible;
         transform: none;
       }
+      tbody th { padding-right: 16px; }
       .menu-block h3 { font-size: 26px; }
       h1 { font-size: 30px; }
       h2 { font-size: 22px; }
