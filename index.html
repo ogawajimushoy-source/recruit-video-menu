@@ -283,23 +283,25 @@
       line-height: 1.7;
     }
     .menu-block { margin-top: 72px; }
-    #staff {
-      margin: 72px 0 0;
-      padding: 56px 0 48px;
+    .block-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(200px, 30%);
+      gap: 20px 48px;
+      align-items: start;
+    }
+    .block-photo {
+      margin: 6px 0 0;
       background: #f3f1ec;
-      box-shadow: 50vw 0 0 0 #f3f1ec, -50vw 0 0 0 #f3f1ec;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
     }
-    #staff thead th,
-    #staff thead th.num { background: #fff; }
-    #staff tbody th,
-    #staff tbody td {
-      background: transparent;
-      border-bottom-color: #e4ddd3;
+    .block-photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    #staff .card {
-      background: transparent;
-      border-top-color: #e4ddd3;
-    }
+    .block-photo img[hidden] { display: none; }
     tr.talk th { padding-top: 14px; padding-bottom: 0; border-bottom: 0; }
     tr.talk-lead th { padding-top: 22px; }
     tr.talk-end th { padding-bottom: 22px; border-bottom: 1px solid #e4ddd3; }
@@ -704,7 +706,11 @@
       .sheet { padding: 0 18px 64px; }
       .site-head { padding-left: 18px; padding-right: 18px; }
       .hero { margin-bottom: 32px; padding: 40px 0 32px; background: #f3f1ec; }
-      #staff { padding: 44px 0 32px; }
+      .block-split { display: flex; flex-direction: column; gap: 16px; }
+      .block-copy { display: contents; }
+      .menu-block h3 { order: 1; }
+      .block-photo { order: 2; margin: 0; aspect-ratio: 16 / 9; }
+      .table-wrap, .cards { order: 3; }
       h1 { font-size: 34px; letter-spacing: 0.08em; }
       .promise { font-size: 17px; }
       h2 { font-size: 24px; letter-spacing: 0.12em; }
@@ -806,6 +812,8 @@
     <p class="section-lead">インサートなしは、インタビュー撮影のみです。オフィスや仕事風景などの追加撮影は行いません。インサートありは、インタビューに加えて、オフィスや仕事風景などを追加撮影して差し込みます。</p>
 
     <section class="menu-block" id="representative">
+      <div class="block-split">
+        <div class="block-copy">
       <h3><span class="block-name">代表</span><span class="block-en">DIRECTOR</span></h3>
       <div class="table-wrap">
         <table>
@@ -885,9 +893,16 @@
           <p class="tax-note">税別</p>
         </article>
       </div>
+        </div>
+        <figure class="block-photo">
+          <img src="images/representative.jpg" alt="" onerror="this.hidden=true">
+        </figure>
+      </div>
     </section>
 
     <section class="menu-block" id="staff">
+      <div class="block-split">
+        <div class="block-copy">
       <h3><span class="block-name">社員</span><span class="block-en">STAFF</span></h3>
       <div class="table-wrap">
         <table>
@@ -993,9 +1008,16 @@
           <p class="tax-note">税別</p>
         </article>
       </div>
+        </div>
+        <figure class="block-photo">
+          <img src="images/staff.jpg" alt="" onerror="this.hidden=true">
+        </figure>
+      </div>
     </section>
 
     <section class="menu-block" id="company">
+      <div class="block-split">
+        <div class="block-copy">
       <h3><span class="block-name">会社</span><span class="block-en">COMPANY</span></h3>
       <div class="table-wrap">
         <table>
@@ -1091,6 +1113,11 @@
           </div>
           <p class="tax-note">税別</p>
         </article>
+      </div>
+        </div>
+        <figure class="block-photo">
+          <img src="images/company.jpg" alt="" onerror="this.hidden=true">
+        </figure>
       </div>
     </section>
 
