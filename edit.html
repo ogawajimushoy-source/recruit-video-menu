@@ -121,7 +121,9 @@
     body.editing .hero,
     body.editing #staff { box-shadow: none; }
     body.editing .page-top { display: none; }
-    body.editing .table-wrap { display: block; }
+    body.editing .table-wrap { display: block; overflow-x: auto; }
+    body.editing .speak-hint,
+    body.editing .speak-pop { display: none; }
     body.editing .cards { display: none; }
     body.editing .menu-block { scroll-margin-top: 72px; }
     body.editing .table-wrap table { min-width: 920px; }
@@ -366,7 +368,7 @@
     <p id="token-state"></p>
   </form>
   <div id="stage"><p class="loading">料金表を読み込んでいます…</p></div>
-  <script src="menu.js?v=17"></script>
+  <script src="menu.js?v=18"></script>
   <script>
     var TOKEN_KEY = "fady-menu-token";
     var CONTENTS_API = "https://api.github.com/repos/ogawajimushoy-source/recruit-video-menu/contents/menu.json";

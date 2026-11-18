@@ -27,6 +27,7 @@
       html { scroll-behavior: auto; }
       .aims a { transition: none; }
       .aims a:hover { transform: none; }
+      .speak-pop { transition: none; }
     }
     body {
       margin: 0;
@@ -367,7 +368,7 @@
       line-height: 1.6;
       text-align: right;
     }
-    .table-wrap { overflow-x: auto; }
+    .table-wrap { overflow: visible; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     col.duration { width: 14%; }
     col.samples { width: 20%; }
@@ -471,7 +472,78 @@
     tr.talk .desc-row,
     .talk-line .desc-row,
     tr.talk .desc,
-    .talk-line .desc { margin-left: 1.1em; }
+    .talk-line .desc,
+    tr.talk .speak-hint,
+    .talk-line .speak-hint,
+    tr.talk .speak-pop,
+    .talk-line .speak-pop { margin-left: 1.1em; }
+    tbody th { position: relative; }
+    .speak-hint {
+      display: block;
+      margin-top: 8px;
+      color: #b7b2aa;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+    }
+    .speak-pop {
+      position: absolute;
+      z-index: 4;
+      left: 16px;
+      top: calc(100% - 12px);
+      width: 240px;
+      margin: 0;
+      padding: 12px 14px 10px;
+      background: #fff;
+      border: 1px solid #e6e2da;
+      border-radius: 2px;
+      box-shadow: 0 12px 28px rgba(70, 60, 45, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
+    }
+    tbody tr:hover .speak-pop,
+    tbody tr:focus-within .speak-pop,
+    .card:hover .speak-pop,
+    .card:focus-within .speak-pop,
+    .talk-line:hover .speak-pop,
+    .talk-line:focus-within .speak-pop {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .speak-pop p {
+      margin: 0 0 6px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+    }
+    .speak-pop ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .speak-pop li {
+      position: relative;
+      margin: 0;
+      padding: 2px 0 2px 0.9em;
+      color: #3a3a3a;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .speak-pop li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #c2bdb4;
+    }
     .card .talk-label {
       margin-bottom: 14px;
       font-size: 17px;
@@ -775,6 +847,21 @@
       .plan-main strong .plan-amount { font-size: inherit; }
       .table-wrap { display: none; }
       .cards { display: block; }
+      .speak-hint { display: none; }
+      .card .speak-pop,
+      .talk-line .speak-pop {
+        position: static;
+        width: auto;
+        margin-top: 10px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
       .menu-block h3 { font-size: 26px; }
       h1 { font-size: 30px; }
       h2 { font-size: 22px; }

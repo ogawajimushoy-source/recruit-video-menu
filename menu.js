@@ -636,6 +636,81 @@
     });
   }
 
+  var SPEAK = {
+    "代表者メッセージ": ["なぜこの会社を続けているか", "求職者に期待すること", "入社後に大事にしてほしいこと"],
+    "事業計画": ["これからの事業の方向", "成長していく分野", "その中で任せる仕事"],
+    "代表が答える100の質問": ["休日の過ごし方", "学生時代に夢中だったこと", "最近うれしかったこと"],
+    "社員紹介（1名）": ["入社のきっかけ", "一日の仕事", "この会社で成長したこと"],
+    "社員の一日": ["出社してからの流れ", "午前と午後の仕事", "まわりとの関わり"],
+    "row-1794462275393": ["出社してからの流れ", "午前と午後の仕事", "まわりとの関わり"],
+    "社員が答える100の質問": ["入社前後のギャップ", "上司との距離感", "仕事でうれしい瞬間"],
+    "代表×社員 対談": ["ふだんの呼び方", "意見が分かれたときの話", "お互いの印象"],
+    "社員×社員 対談": ["同期との関係", "教えてもらったこと", "部署を越えたやり取り"],
+    "座談会（3〜4名）": ["社内の空気", "ランチや休憩の話", "困ったときの助け合い"],
+    "会社紹介": ["会社の成り立ち", "事業の全体像", "働く人の雰囲気"],
+    "row-1794462538667": ["会社の成り立ち", "事業の全体像", "働く人の雰囲気"],
+    "事業内容紹介": ["主な仕事の流れ", "お客様との関わり", "他社との違い"],
+    "row-1794529192476": ["主な仕事の流れ", "お客様との関わり", "他社との違い"],
+    "福利厚生紹介": ["実際に使っている制度", "休みの取り方", "制度を使う人の声"],
+    "ルームツアー": ["入り口から執務室まで", "打ち合わせする場所", "休憩できる場所"],
+    "オフィスツアー": ["入り口から執務室まで", "打ち合わせする場所", "休憩できる場所"],
+    "HPトップムービー": ["会社の第一印象", "仕事をしている場面", "人の表情"],
+    "row-1794807835279": ["会社の第一印象", "仕事をしている場面", "人の表情"]
+  };
+
+  function speakLines(id, name) {
+    if (id && Object.prototype.hasOwnProperty.call(SPEAK, id)) return SPEAK[id];
+    if (name && Object.prototype.hasOwnProperty.call(SPEAK, name)) return SPEAK[name];
+    return null;
+  }
+
+  function speakPop(lines) {
+    var hint = document.createElement("span");
+    hint.className = "speak-hint";
+    hint.textContent = "テーマ例";
+    var pop = document.createElement("div");
+    pop.className = "speak-pop";
+    var label = document.createElement("p");
+    label.textContent = "話すテーマの例";
+    var list = document.createElement("ul");
+    lines.forEach(function (text) {
+      var item = document.createElement("li");
+      item.textContent = text;
+      list.appendChild(item);
+    });
+    pop.append(label, list);
+    return { hint: hint, pop: pop };
+  }
+
+  function placeSpeak(host, id, name) {
+    if (!host) return;
+    host.querySelectorAll(":scope > .speak-hint, :scope > .speak-pop").forEach(function (node) { node.remove(); });
+    var lines = speakLines(id, name);
+    if (!lines) return;
+    var built = speakPop(lines);
+    var desc = host.querySelector(":scope > .desc");
+    if (desc) desc.after(built.hint, built.pop);
+    else host.append(built.hint, built.pop);
+  }
+
+  function applyThemes() {
+    document.querySelectorAll(".menu-block tbody tr[data-id]").forEach(function (tr) {
+      var name = tr.querySelector(".name");
+      placeSpeak(tr.querySelector("th"), tr.dataset.id, name ? name.textContent.trim() : "");
+      var cell = tr.querySelector("th");
+      if (cell) cell.tabIndex = 0;
+    });
+    document.querySelectorAll(".menu-block article.card").forEach(function (card) {
+      if (card.querySelector(".talk-line")) return;
+      var name = card.querySelector("h4");
+      placeSpeak(card, card.dataset.id, name ? name.textContent.trim() : "");
+    });
+    document.querySelectorAll(".talk-line").forEach(function (line) {
+      var name = line.querySelector("h4, .name");
+      placeSpeak(line, line.getAttribute("data-line"), name ? name.textContent.trim() : "");
+    });
+  }
+
   function apply(data) {
     data = data || {};
     applyPage(data.page);
@@ -665,6 +740,7 @@
     });
     applyVideos(data.videos || {});
     placeGroups();
+    applyThemes();
     decoratePrices();
   }
 
