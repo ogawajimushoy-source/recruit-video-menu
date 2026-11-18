@@ -226,6 +226,38 @@
       line-height: 1.7;
       text-wrap: pretty;
     }
+    .aims li.aim-wide { grid-column: 1 / -1; }
+    .aims li.aim-wide a {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: "label prices" "title prices" "examples prices";
+      column-gap: 36px;
+      align-items: center;
+      padding: 22px 28px;
+    }
+    .aims li.aim-wide a > span { grid-area: label; }
+    .aims li.aim-wide a > strong { grid-area: title; margin-top: 6px; font-size: 18px; }
+    .aims li.aim-wide a > em { grid-area: examples; margin: 6px 0 0; }
+    .aims li.aim-wide .aim-prices {
+      grid-area: prices;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 240px;
+      margin: 0;
+      padding: 0 0 0 28px;
+      border-top: 0;
+      border-left: 1px solid #efece6;
+    }
+    .aims li.aim-wide .aim-note {
+      margin: 10px 0 0;
+      color: #8a8680;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
     .rule { margin: 64px 0 0; border: 0; border-top: 1px solid var(--line); }
     .section-label {
       margin: 0 0 8px;
@@ -744,6 +776,18 @@
         text-align: center;
       }
       .aims, .choices, .themes { grid-template-columns: 1fr; }
+      .aims li.aim-wide a {
+        grid-template-columns: 1fr;
+        grid-template-areas: "label" "title" "examples" "prices";
+        row-gap: 0;
+      }
+      .aims li.aim-wide .aim-prices {
+        min-width: 0;
+        margin-top: 16px;
+        padding: 14px 0 0;
+        border-left: 0;
+        border-top: 1px solid #efece6;
+      }
       .series-head { align-items: flex-start; }
       .plan { align-items: flex-start; margin-left: 0; }
       .plan-single, .plan-insert { text-align: left; white-space: normal; }
@@ -813,6 +857,18 @@
           <div class="aim-prices">
             <p class="aim-price"><span>インサートなし</span><strong>20万円〜</strong></p>
             <p class="aim-price"><span>インサートあり</span><strong>30万円〜</strong></p>
+          </div>
+        </a>
+      </li>
+      <li class="aim-wide">
+        <a href="#series">
+          <span>シリーズ</span>
+          <strong>テーマごとに、想いや現場の声を伝えたい</strong>
+          <em>代表が語るシリーズ、社員が語るシリーズ</em>
+          <div class="aim-prices">
+            <p class="aim-price"><span>1本のみ</span><strong>20万円／本</strong></p>
+            <p class="aim-price"><span>2本以上</span><strong>15万円／本</strong></p>
+            <p class="aim-note">インサート撮影込み</p>
           </div>
         </a>
       </li>
