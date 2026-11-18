@@ -117,6 +117,8 @@
     #stage .loading { width: min(920px, 100%); margin: 0 auto; padding: 28px; }
   </style>
   <style id="overrides">
+    body.editing .site-head { position: static; width: auto; margin-left: 0; margin-right: 0; padding: 12px 0 16px; }
+    body.editing .page-top { display: none; }
     body.editing .table-wrap { display: block; }
     body.editing .cards { display: none; }
     body.editing .menu-block { scroll-margin-top: 72px; }
@@ -1742,13 +1744,11 @@
     }
 
     function enhancePage() {
-      bindEdit(document.querySelector("p.company"), "page-title");
+      document.querySelectorAll(".company").forEach(function (node) { bindEdit(node, "page-title"); });
       bindEdit(document.querySelector(".kicker"), "desc");
       bindEdit(document.getElementById("page-title"), "page-title");
       bindEdit(document.querySelector(".promise"), "desc");
       bindEdit(document.querySelector("p.lead"), "desc");
-      var footCompany = document.querySelector(".foot .company");
-      if (footCompany) bindEdit(footCompany, "page-title");
     }
 
     function enhanceMenuIntro() {
